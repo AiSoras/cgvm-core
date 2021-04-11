@@ -1,0 +1,451 @@
+options {
+    SANITY_CHECK = true;
+    DEBUG_PARSER = true;
+ }
+
+PARSER_BEGIN(CgifParser)
+
+package ru.etu.cgvm.javacc.parser;
+
+import ru.etu.cgvm.objects.Arc;
+import ru.etu.cgvm.objects.Referent;
+import ru.etu.cgvm.objects.SignatureParameter;
+import ru.etu.cgvm.objects.Type;
+import ru.etu.cgvm.objects.base.Node;
+import ru.etu.cgvm.objects.nodes.Actor;
+import ru.etu.cgvm.objects.nodes.Concept;
+import ru.etu.cgvm.objects.nodes.Graph;
+import ru.etu.cgvm.objects.nodes.Relation;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+public class CgifParser {
+
+     private Graph topGraph;
+
+     public Graph parseCgifString (String contents) throws ParseException {
+            InputStream is = new ByteArrayInputStream(contents.getBytes());
+            topGraph = new Graph();
+            initTopLevelGraph();
+            return topGraph;
+        }
+}
+PARSER_END(CgifParser)
+
+SKIP : {
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+// when /* is seen in the DEFAULT state, skip it and switch to the IN_MULTI_LINE_COMMENT state
+MORE : {
+  "/*" : IN_MULTI_LINE_COMMENT
+}
+
+// when any other character is seen in the IN_MULTI_LINE_COMMENT state, skip it.
+<IN_MULTI_LINE_COMMENT> MORE : {
+    < ~[] >
+}
+
+// when */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
+<IN_MULTI_LINE_COMMENT> SPECIAL_TOKEN : {
+     "*/" : DEFAULT
+}
+
+TOKEN : {
+    <LBRACE: "{">
+|   <RBRACE: "}">
+|   <LPAREN: "(">
+|   <RPAREN: ")">
+|   <LBRACKET: "[">
+|   <RBRACKET: "]">
+|   <COLON: ":">
+|   <QUESTIONMARK: "?">
+|   <STAR: "*">
+|   <COMMA: ",">
+|   <AMP: "&">
+|   <ATSIGN: "@">
+|   <POUNDSIGN: "#">
+|   <PERCENTSIGN: "%">
+|   <LESSTHAN: "<">
+|   <GREATERTHAN: ">">
+|   <EQUAL: "=">
+|   <BAR: "|">
+|   <DOUBLEQUOTE: "\"">
+|   <SINGLEQUOTE: "'">
+|   <UNDERSCORE: "_">
+|   <TILDE: "~">
+|   <TYPEHIERARCHY: "TypeHierarchy">
+|   <RELATIONHIERARCHY: "RelationHierarchy">
+|   <TYPELABEL: "TypeLabel">
+|   <RELATIONLABEL: "RelationLabel">
+|   <LAMBDAEXPRESSION: "LambdaExpression">
+|   <DEF : "Def">
+|   <LAMBDA : "lambda">
+|   <ORDER : "EQ" | "GT" | "LT">
+}
+
+TOKEN : {
+/* LITERALS */
+    < #INTEGER_LITERAL:
+          <DECIMAL_LITERAL> (["l","L"])?
+        | <HEX_LITERAL> (["l","L"])?
+        | <OCTAL_LITERAL> (["l","L"])?>
+|   < DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|   < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|   < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+|   < #FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"] >
+|   < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|   < NUMBER_LITERAL: <INTEGER_LITERAL> | <FLOATING_POINT_LITERAL> > // Число
+|   <QUOTED_STRING: // Текст
+        <DOUBLEQUOTE>
+        ("\\" ~[] | ~["\"","\\"])*
+        <DOUBLEQUOTE>>
+/* REFERENT */
+|   <ADDITIONAL_INFO: <PERCENTSIGN><IDENTIFIER>>
+|   <LOCATOR: (<SINGLEQUOTE> ("\\" ~["n", "r"] | ~["\"","\\", "\'"])* <SINGLEQUOTE>) | <IDENTIFIER> |<POUNDSIGN>(<DECIMAL_LITERAL>|<IDENTIFIER>)>
+|   <QUANTIFIER:<ATSIGN>(((<LESSTHAN>|<GREATERTHAN>|<EQUAL>)?<DECIMAL_LITERAL>)|<IDENTIFIER>)>
+|   <#SET_ELEMENTS: ((<RELATED_MARK> | <IDENTIFIER>)(<COMMA>(<RELATED_MARK> | <IDENTIFIER>))*) | <STAR>>
+|   <STRUCTURE: <LBRACE><SET_ELEMENTS><RBRACE> | <LESSTHAN><SET_ELEMENTS><GREATERTHAN>>
+/* IDENTIFIERS */
+|   <#DIGIT: ["0"-"9"]>
+|   <#LETTER: ["A"-"Z", "a"-"z"]>
+|   <IDENTIFIER:  <LETTER> (<LETTER> | <DIGIT> | <UNDERSCORE> )* >
+/* MARK */
+|   <RELATED_MARK: <QUESTIONMARK><IDENTIFIER>>
+|   <DEFINING_MARK: <STAR><IDENTIFIER>>
+}
+
+/* Root production. */
+void initTopLevelGraph(): {}
+{
+    graph(null) <EOF>
+}
+
+/* Parses a graph and adds its elements to  */
+Graph graph(Graph enclosingGraph): {
+    Graph graph;
+        if (enclosingGraph == null) {
+            graph = topGraph;
+        } else {
+            graph = new Graph(enclosingGraph);
+        }
+} {
+    (term(graph))*
+    {
+    return graph;
+    }
+}
+
+void term(Graph g): {} {
+    LOOKAHEAD(3) concept(g) | relation(g) | actor(g) | LOOKAHEAD(2) context(g) | LOOKAHEAD(2) conceptTypeHierarchy(g) | LOOKAHEAD(2) relationTypeHierarchy(g)
+}
+
+Referent.Designation designation(): {
+    Referent.Designation designation = new Referent.Designation();
+    Token element = null;
+    Token additionalInfo;
+} {
+    ([additionalInfo = <ADDITIONAL_INFO>
+    {
+        designation.setAdditionalInfo(additionalInfo.image);
+    }
+    ] (element = <NUMBER_LITERAL> | element = <QUOTED_STRING>)
+    {
+        designation.setLiteral(element.image);
+    }
+  | element = <LOCATOR>
+    {
+      designation.setLocator(element.image);
+    }
+  | element = <QUANTIFIER>
+    {
+        designation.setQuantifier(element.image);
+    })
+    {
+        return designation;
+    }
+}
+
+Referent.Descriptor descriptor(): {
+    Referent.Descriptor descriptor = new Referent.Descriptor();
+    Token additionalInfo;
+    Token structure;
+} {
+    [additionalInfo = <ADDITIONAL_INFO>
+    {
+        descriptor.setAdditionalInfo(additionalInfo.image);
+    }
+    ] (structure = <STRUCTURE>)
+    {
+        descriptor.setStructure(structure.image);
+        return descriptor;
+    }
+}
+
+Referent referent(): {
+    Referent referent = new Referent();
+    Referent.Descriptor descriptor = null;
+    Referent.Designation designation = null;
+} {
+     <COLON> [LOOKAHEAD(2) descriptor = descriptor()] [designation = designation()]
+    {
+        referent.setDescriptor(descriptor);
+        referent.setDesignation(designation);
+        return referent;
+    }
+  | <TILDE>
+    {
+        referent.setNegated(true);
+        return referent;
+    }
+}
+
+Concept concept(Graph enclosingGraph): {
+    Concept concept = new Concept();
+    Type type = null;
+    Referent referent = null;
+    Token coreferenceLink;
+} {
+   <LBRACKET> [LOOKAHEAD(2) type = type(concept)] [
+   (coreferenceLink = <RELATED_MARK>
+   {
+        concept.addCoreferenceLink(coreferenceLink.image);
+   }
+   )+ | coreferenceLink = <DEFINING_MARK>
+   {
+        concept.addCoreferenceLink(coreferenceLink.image);
+   }
+   ] [referent = referent()] <RBRACKET>
+   {
+        concept.setType(type);
+        concept.setReferent(referent);
+        enclosingGraph.addObject(concept);
+        return concept;
+   }
+}
+
+Arc arc(Graph g): {
+    Arc arc = new Arc();
+    Concept concept;
+    Token coreferenceLink;
+} {
+    (concept = concept(g)
+    {
+        arc.setConcept(concept);
+    }| coreferenceLink = <RELATED_MARK>
+    {
+        arc.setCoreferenceLink(coreferenceLink.image);
+    })
+    {
+        return arc;
+    }
+}
+
+void relation(Graph enclosingGraph): {
+    Relation relation = new Relation();
+    Type type;
+    Arc arc;
+} {
+    <LPAREN> type = type(relation) (arc = arc(enclosingGraph)
+    {
+        relation.addArc(arc);
+    }
+    )+ <RPAREN>
+    {
+        relation.setType(type);
+        enclosingGraph.addObject(relation);
+    }
+}
+
+void actor(Graph g): {
+    Actor actor = new Actor();
+    Type type;
+    Arc arc;
+} {
+    <LESSTHAN> type = type(g) (arc = arc(g)
+    {
+        actor.addInputArc(arc);
+    }
+    )+ <BAR>
+    (arc = arc(g)
+    {
+        actor.addOutputArc(arc);
+    }
+    )+
+    <GREATERTHAN>
+    {
+        actor.setType(type);
+        g.addObject(actor);
+    }
+}
+
+Graph lambda(Graph enclosingGraph): {
+    SignatureParameter signatureParameter;
+    Graph lambda = new Graph();
+} {
+    <LPAREN><LAMBDA><LPAREN>(signatureParameter = parameter(lambda)
+    {
+        lambda.addSignatureParameter(signatureParameter);
+    }
+    (<COMMA> signatureParameter = parameter(lambda)
+    {
+        lambda.addSignatureParameter(signatureParameter);
+    }
+    )*)?<RPAREN> (term(lambda))*<RPAREN>
+    {
+        enclosingGraph.addObject(lambda);
+        return lambda;
+    }
+}
+
+SignatureParameter parameter(Graph g): {
+    SignatureParameter signatureParameter = new SignatureParameter();
+    Type type;
+    Token variable;
+} {
+    type = type(g) [variable = <DEFINING_MARK>
+    {
+        signatureParameter.setVariable(variable.image);
+    }]
+    {
+        signatureParameter.setType(type);
+        return signatureParameter;
+    }
+}
+
+Type type(Node g): {
+    Type type = new Type();
+    Token name;
+    Token negation;
+} {
+    [negation = <TILDE>
+    {
+        type.setNegated(negation.image);
+    }
+    ] name = <IDENTIFIER>
+    {
+        type.setName(name.image);
+        return type;
+    }
+}
+
+void context(Graph enclosingGraph): {
+    Graph context = new Graph();
+    Token contextName;
+} {
+   ( <TILDE>
+   {
+       context.setNegated(true);
+   }
+   <LBRACKET> (term(context))*<RBRACKET>
+  |  <LBRACKET> contextName = <IDENTIFIER>
+    {
+        context.setContext(contextName.image);
+    } (<COLON>)? (term(context))* <RBRACKET>)
+    {
+        enclosingGraph.addObject(context);
+    }
+}
+
+void conceptTypeHierarchy(Graph g): {} {
+    <LBRACKET> <TYPEHIERARCHY> <COLON>
+    (LOOKAHEAD(2) conceptTypeDefinition(g) | conceptTypeOrder(g))+
+    <RBRACKET>
+}
+
+void relationTypeHierarchy(Graph g): {} {
+    <LBRACKET> <RELATIONHIERARCHY> <COLON>
+    (LOOKAHEAD(2) relationTypeDefinition(g) | relationTypeOrder(g))+
+    <RBRACKET>
+}
+
+void conceptTypeDefinition(Graph g): {
+    Graph definition;
+    String typeName;
+} {
+    <LPAREN> <DEF>
+    typeName = conceptTypeLabel()
+    definition = lambdaExpression(g)
+    <RPAREN>
+    {
+        g.getTypeHierarchy().addTypeDefinition(typeName, definition);
+    }
+}
+
+void relationTypeDefinition(Graph g): {
+    Graph definition;
+    String typeName;
+} {
+    <LPAREN> <DEF>
+    typeName = relationTypeLabel()
+    definition = lambdaExpression(g)
+    <RPAREN>
+    {
+        g.getTypeHierarchy().addTypeDefinition(typeName, definition);
+    }
+}
+
+String conceptTypeLabel(): {
+    Token typeName;
+} {
+    <LBRACKET> <TYPELABEL> <COLON> <DOUBLEQUOTE> (typeName = <IDENTIFIER>) <DOUBLEQUOTE> <RBRACKET>
+    {
+        return typeName.image;
+    }
+}
+
+String relationTypeLabel(): {
+    Token typeName;
+} {
+    <LBRACKET> <RELATIONLABEL> <COLON> <DOUBLEQUOTE> (typeName = <IDENTIFIER>) <DOUBLEQUOTE> <RBRACKET>
+    {
+        return typeName.image;
+    }
+}
+
+Graph lambdaExpression(Graph g): {
+    Graph definition;
+} {
+    <LBRACKET> <LAMBDAEXPRESSION> <COLON> <DOUBLEQUOTE> (definition = lambda(g)) <DOUBLEQUOTE> <RBRACKET>
+    {
+        return definition;
+    }
+}
+
+void conceptTypeOrder(Graph g): {
+    String firstType;
+    String secondType;
+    Token order;
+} {
+    <LPAREN>
+    order = <ORDER>
+    firstType = conceptTypeLabel()
+    secondType = conceptTypeLabel()
+    <RPAREN>
+    {
+        g.getTypeHierarchy().addTypeOrder(firstType, secondType, order.image);
+    }
+}
+
+void relationTypeOrder(Graph g): {
+    String firstType;
+    String secondType;
+    Token order;
+} {
+    <LPAREN>
+    order = <ORDER>
+    firstType = relationTypeLabel()
+    secondType = relationTypeLabel()
+    <RPAREN>
+    {
+        g.getTypeHierarchy().addTypeOrder(firstType, secondType, order.image);
+    }
+}
