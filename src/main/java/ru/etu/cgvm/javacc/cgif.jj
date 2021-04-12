@@ -19,17 +19,24 @@ import ru.etu.cgvm.objects.nodes.Relation;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 public class CgifParser {
 
      private Graph topGraph;
 
-     public Graph parseCgifString (String contents) throws ParseException {
-            InputStream is = new ByteArrayInputStream(contents.getBytes());
+     public CgifParser() {
+         this((Reader) null);
+     }
+
+     public Graph parse(String content) throws ParseException {
+            InputStream is = new ByteArrayInputStream(content.getBytes());
+            ReInit(is, StandardCharsets.UTF_8.name());
             topGraph = new Graph();
             initTopLevelGraph();
             return topGraph;
-        }
+     }
 }
 PARSER_END(CgifParser)
 
@@ -90,27 +97,23 @@ TOKEN : {
 
 TOKEN : {
 /* LITERALS */
-    < #INTEGER_LITERAL:
-          <DECIMAL_LITERAL> (["l","L"])?
-        | <HEX_LITERAL> (["l","L"])?
-        | <OCTAL_LITERAL> (["l","L"])?>
-|   < DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
-|   < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
-|   < #OCTAL_LITERAL: "0" (["0"-"7"])* >
-|   < #FLOATING_POINT_LITERAL:
+   < DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|  < FLOATING_POINT_LITERAL:
         (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
       | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
       | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
       | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"] >
 |   < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
-|   < NUMBER_LITERAL: <INTEGER_LITERAL> | <FLOATING_POINT_LITERAL> > // Число
 |   <QUOTED_STRING: // Текст
         <DOUBLEQUOTE>
         ("\\" ~[] | ~["\"","\\"])*
         <DOUBLEQUOTE>>
+|   <CHARACTER_LITERAL: // Name
+        <SINGLEQUOTE>
+        ("\\" ~["n", "r"] | ~["\"","\\", "\'"])*
+        <SINGLEQUOTE>>
 /* REFERENT */
 |   <ADDITIONAL_INFO: <PERCENTSIGN><IDENTIFIER>>
-|   <LOCATOR: (<SINGLEQUOTE> ("\\" ~["n", "r"] | ~["\"","\\", "\'"])* <SINGLEQUOTE>) | <IDENTIFIER> |<POUNDSIGN>(<DECIMAL_LITERAL>|<IDENTIFIER>)>
 |   <QUANTIFIER:<ATSIGN>(((<LESSTHAN>|<GREATERTHAN>|<EQUAL>)?<DECIMAL_LITERAL>)|<IDENTIFIER>)>
 |   <#SET_ELEMENTS: ((<RELATED_MARK> | <IDENTIFIER>)(<COMMA>(<RELATED_MARK> | <IDENTIFIER>))*) | <STAR>>
 |   <STRUCTURE: <LBRACE><SET_ELEMENTS><RBRACE> | <LESSTHAN><SET_ELEMENTS><GREATERTHAN>>
@@ -124,28 +127,23 @@ TOKEN : {
 }
 
 /* Root production. */
-void initTopLevelGraph(): {}
-{
-    graph(null) <EOF>
+void initTopLevelGraph(): {} {
+    graph(null)
 }
 
-/* Parses a graph and adds its elements to  */
-Graph graph(Graph enclosingGraph): {
+void graph(Graph enclosingGraph): {
     Graph graph;
-        if (enclosingGraph == null) {
-            graph = topGraph;
-        } else {
-            graph = new Graph(enclosingGraph);
-        }
-} {
-    (term(graph))*
-    {
-    return graph;
+    if (enclosingGraph == null) {
+        graph = topGraph;
+    } else {
+        graph = new Graph(enclosingGraph);
     }
+} {
+    (term(graph))+
 }
 
 void term(Graph g): {} {
-    LOOKAHEAD(3) concept(g) | relation(g) | actor(g) | LOOKAHEAD(2) context(g) | LOOKAHEAD(2) conceptTypeHierarchy(g) | LOOKAHEAD(2) relationTypeHierarchy(g)
+    LOOKAHEAD(3) concept(g) | relation(g) | actor(g) | LOOKAHEAD(3) context(g) | LOOKAHEAD(3) conceptTypeHierarchy(g) | relationTypeHierarchy(g)
 }
 
 Referent.Designation designation(): {
@@ -157,11 +155,11 @@ Referent.Designation designation(): {
     {
         designation.setAdditionalInfo(additionalInfo.image);
     }
-    ] (element = <NUMBER_LITERAL> | element = <QUOTED_STRING>)
+    ] (element = <DECIMAL_LITERAL> | element = <FLOATING_POINT_LITERAL> | element = <QUOTED_STRING>)
     {
         designation.setLiteral(element.image);
     }
-  | element = <LOCATOR>
+  | (element = <CHARACTER_LITERAL> | element = <IDENTIFIER> | element = <POUNDSIGN>(<DECIMAL_LITERAL>|<IDENTIFIER>))
     {
       designation.setLocator(element.image);
     }
@@ -214,16 +212,16 @@ Concept concept(Graph enclosingGraph): {
     Referent referent = null;
     Token coreferenceLink;
 } {
-   <LBRACKET> [LOOKAHEAD(2) type = type(concept)] [
-   (coreferenceLink = <RELATED_MARK>
+   <LBRACKET> [LOOKAHEAD(2) type = type(concept)]
+   [(coreferenceLink = <RELATED_MARK>
    {
         concept.addCoreferenceLink(coreferenceLink.image);
    }
    )+ | coreferenceLink = <DEFINING_MARK>
    {
         concept.addCoreferenceLink(coreferenceLink.image);
-   }
-   ] [referent = referent()] <RBRACKET>
+   }]
+   [referent = referent()] <RBRACKET>
    {
         concept.setType(type);
         concept.setReferent(referent);
@@ -234,12 +232,16 @@ Concept concept(Graph enclosingGraph): {
 
 Arc arc(Graph g): {
     Arc arc = new Arc();
+    Graph context; // concept or context
     Concept concept;
     Token coreferenceLink;
 } {
-    (concept = concept(g)
+    (LOOKAHEAD(3) concept = concept(g)
     {
         arc.setConcept(concept);
+    }| LOOKAHEAD(3) context = context(g)
+    {
+        arc.setContext(context);
     }| coreferenceLink = <RELATED_MARK>
     {
         arc.setCoreferenceLink(coreferenceLink.image);
@@ -299,7 +301,7 @@ Graph lambda(Graph enclosingGraph): {
     {
         lambda.addSignatureParameter(signatureParameter);
     }
-    )*)?<RPAREN> (term(lambda))*<RPAREN>
+    )*)?<RPAREN> (term(lambda))+<RPAREN>
     {
         enclosingGraph.addObject(lambda);
         return lambda;
@@ -337,7 +339,7 @@ Type type(Node g): {
     }
 }
 
-void context(Graph enclosingGraph): {
+Graph context(Graph enclosingGraph): {
     Graph context = new Graph();
     Token contextName;
 } {
@@ -345,13 +347,14 @@ void context(Graph enclosingGraph): {
    {
        context.setNegated(true);
    }
-   <LBRACKET> (term(context))*<RBRACKET>
+   <LBRACKET> (term(context))+<RBRACKET>
   |  <LBRACKET> contextName = <IDENTIFIER>
     {
         context.setContext(contextName.image);
-    } (<COLON>)? (term(context))* <RBRACKET>)
+    } (<COLON>)? (term(context))+ <RBRACKET>)
     {
         enclosingGraph.addObject(context);
+        return context;
     }
 }
 
@@ -396,7 +399,7 @@ void relationTypeDefinition(Graph g): {
 String conceptTypeLabel(): {
     Token typeName;
 } {
-    <LBRACKET> <TYPELABEL> <COLON> <DOUBLEQUOTE> (typeName = <IDENTIFIER>) <DOUBLEQUOTE> <RBRACKET>
+    <LBRACKET> <TYPELABEL> <COLON> (typeName = <IDENTIFIER>) <RBRACKET>
     {
         return typeName.image;
     }
@@ -405,7 +408,7 @@ String conceptTypeLabel(): {
 String relationTypeLabel(): {
     Token typeName;
 } {
-    <LBRACKET> <RELATIONLABEL> <COLON> <DOUBLEQUOTE> (typeName = <IDENTIFIER>) <DOUBLEQUOTE> <RBRACKET>
+    <LBRACKET> <RELATIONLABEL> <COLON> (typeName = <IDENTIFIER>) <RBRACKET>
     {
         return typeName.image;
     }
@@ -414,7 +417,7 @@ String relationTypeLabel(): {
 Graph lambdaExpression(Graph g): {
     Graph definition;
 } {
-    <LBRACKET> <LAMBDAEXPRESSION> <COLON> <DOUBLEQUOTE> (definition = lambda(g)) <DOUBLEQUOTE> <RBRACKET>
+    <LBRACKET> <LAMBDAEXPRESSION> <COLON> (definition = lambda(g)) <RBRACKET>
     {
         return definition;
     }

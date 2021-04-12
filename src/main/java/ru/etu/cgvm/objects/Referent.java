@@ -26,6 +26,16 @@ public class Referent {
         private String literal;
         private String locator;
         private String quantifier;
+
+        @Override
+        public String toString() {
+            return "Designation{" +
+                    "additionalInfo='" + additionalInfo + '\'' +
+                    ", literal='" + literal + '\'' +
+                    ", locator='" + locator + '\'' +
+                    ", quantifier='" + quantifier + '\'' +
+                    '}';
+        }
     }
 
     @Getter
@@ -38,6 +48,14 @@ public class Referent {
         public List<String> getStructureMembers() {
             return Arrays.stream(Optional.ofNullable(structure).orElse("").replaceAll("[<>{}]", "")
                     .split(",")).map(String::trim).collect(Collectors.toList());
+        }
+
+        @Override
+        public String toString() {
+            return "Descriptor{" +
+                    "additionalInfo='" + additionalInfo + '\'' +
+                    ", structure='" + structure + '\'' +
+                    '}';
         }
     }
 }
