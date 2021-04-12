@@ -15,10 +15,6 @@ public class Type {
     @Getter
     private boolean isNegated;
 
-    public Type(String name) {
-        this.name = name;
-    }
-
     public void setNegated(String tilde) {
         isNegated = StringUtils.isNotBlank(tilde);
     }

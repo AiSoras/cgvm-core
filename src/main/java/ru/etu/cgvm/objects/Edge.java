@@ -59,34 +59,11 @@ public class Edge extends GraphObject {
      * @return true if there is any GEdge connecting the two; false otherwise.
      */
     public static boolean areLinked(Node node, Node go2) {
-        for (Object theEdge : node.getEdges()) {
-            if (((Edge) theEdge).isLinkedTo(go2) != null) {
+        for (Edge edge : node.getEdges()) {
+            if (edge.isLinkedTo(go2) != null) {
                 return true;
             }
         }
         return false;
     }
-
-    /**
-     * Does everything but the actual removal (de-allocation)
-     */
-    @Override
-    public void abandonObject() {
-        if ((source != null) || (destination != null)) {
-            detachFromNodes();
-        }
     }
-
-    /**
-     * Finds the endpoint nodes of the edge, and removes the edge from each of
-     * their lists
-     */
-    public void detachFromNodes() {
-        if (source != null) {
-            ((Node) source).deleteEdge(this);
-        }
-        if (destination != null) {
-            ((Node) destination).deleteEdge(this);
-        }
-    }
-}

@@ -16,7 +16,7 @@ public class Actor extends Node {
     }
 
     public List<Arc> getInputArcs() {
-        return new LinkedList<>(outputArcs);
+        return new LinkedList<>(inputArcs);
     }
 
     public void addOutputArc(Arc arc) {

@@ -52,30 +52,6 @@ public class Graph extends Concept {
         return context != null || isNegated;
     }
 
-    /**
-     * Determine whether the given graph is negatively nested; i.e., is it
-     * oddly-nested in the existential graph sense (where only cuts/negative
-     * contexts matter).
-     *
-     * @return true if we're negatively nested (ultimately oddly-nested with
-     * respect to cuts).
-     */
-    public boolean isNegativelyNested() {
-        if (owner == null) {
-            return false;       // without an owner, got to be positive
-        } else {
-            boolean negativeSoFar = this.isNegated;
-            Graph graph = this.getOwner();        // we've already checked to ensure that g isn't null
-            while (graph != null) {
-                if (graph.isNegated()) {
-                    negativeSoFar = !negativeSoFar;
-                }
-                graph = graph.getOwner();
-            }
-            return negativeSoFar;
-        }
-    }
-
     public Map<ObjectID, GraphObject> getObjects() {
         return new HashMap<>(objectStore);
     }
@@ -89,52 +65,6 @@ public class Graph extends Concept {
         object.setOwner(this);
         objectStore.put(object.getId(), object);
     }
-
-    /**
-     * Detaches the given graph object from a CharGer graph. Any remaining links
-     * or pointers in the graph object are the responsibility of the
-     * implementer.
-     */
-    public void removeFromGraph(GraphObject graphObject) {
-        log.info("Removing the object '{}' to the graph '{}'...", graphObject.getId(), this.getId());
-        objectStore.remove(graphObject.getId());
-    }
-
-    /**
-     * Inserts an object into the graph, proposing the target graph as its
-     * owner. In general, this is just a wrapper for insertIncharGerGraph,
-     * except in one set of cases: where a GEdge crosses a context boundary. In
-     * that case, this method finds the two end nodes of the edge, and inserts
-     * the edge into the innermost enclosing context that also encloses both of
-     * the end nodes.
-     *
-     * @param graphObject Object to be added to the target graph.
-     * @see Graph#addObject
-     * @see Graph#forgetObject
-     */
-    // TODO: проверить алгоритм
-//    public void insertObject(GraphObject graphObject) {
-//        if (this.equals(graphObject)) {
-//            return; // prevent adding a graph object to itself, with overflow results
-//        }
-//        // if the object is an edge, find the most dominant context for it.
-//        if (graphObject.getKind() == Kind.EDGE) {
-//            Edge edge = (Edge) graphObject;
-//            if (edge.getDestination() != null && edge.getSource() != null) {
-//                Collection<GraphObject> nodes = new LinkedList<>();
-//                nodes.add(edge.getDestination());
-//                nodes.add(edge.getSource());
-//
-//                Optional.ofNullable(GraphObject.getDominantContext(nodes))
-//                        .orElseThrow(() -> new IllegalStateException("Dominant context should not be null!"))
-//                        .addObject(graphObject);
-//            } else {
-//                addObject(graphObject);
-//            }
-//        } else {
-//            addObject(graphObject);
-//        }
-//    }
 
     /**
      * Determines whether this graph is nested (at any level) within a given graph.
@@ -180,17 +110,5 @@ public class Graph extends Concept {
             }
         }
         return Optional.empty();
-    }
-
-    /**
-     * Removes object from this graph, removes it from the knowledge base and
-     * logically garbages the object. This operation should result in a
-     * correctly formed graph.
-     *
-     * @param go object to be erased from target graph
-     */
-    public void forgetObject(GraphObject go) {
-        go.abandonObject();     // remove from visible graph structure
-        go.getOwner().removeFromGraph(go);
     }
 }

@@ -1,10 +1,12 @@
 package ru.etu.cgvm.objects;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Optional;
 
+@NoArgsConstructor
 public class SignatureParameter {
 
     @Setter

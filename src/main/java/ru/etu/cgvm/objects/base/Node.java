@@ -17,7 +17,6 @@ public abstract class Node extends GraphObject {
     protected Type type;
     @Getter
     protected List<Edge> edges = new LinkedList<>();
-    protected Mark mark = new Mark();
 
     protected Node() {
         super(Kind.NODE);
@@ -56,73 +55,7 @@ public abstract class Node extends GraphObject {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Disconnects itself from any other GNodes, by telling each of its edges to
-     * erase itself.
-     */
-    @Override
-    public void abandonObject() {
-        while (!edges.isEmpty()) {
-            Edge toBeRemoved = edges.get(0);
-            toBeRemoved.getOwner().forgetObject(toBeRemoved);
-        }
-    }
-
     public void deleteEdge(Edge ge) {
         edges.remove(ge);
-    }
-
-
-    /**
-     * Does the marker indicate object has changed?
-     *
-     * @return true if ready
-     */
-    public boolean isChanged() {
-        return mark.isChanged();
-    }
-
-    /**
-     * Sets this node's mark to indicate that it's been changed.
-     *
-     * @param b whether to tell the mark that the node is changed or not.
-     */
-    public void setChanged(boolean b) {
-        mark.setChanged(b);
-    }
-
-    /**
-     * Does the marker indicate an active input concept to an actor?
-     */
-    public boolean isActive() {
-        return mark.isActive();
-    }
-
-    /**
-     * Used when activating CG actors to mark this node as active in a sequence
-     * of firings.
-     *
-     * @param b
-     */
-    public void setActive(boolean b) {
-        mark.setActive(b);
-    }
-
-    /**
-     * Contains the information used for the marking algorithm for actor updating.
-     */
-    private static class Mark {
-        /**
-         * Whether the node we're marking has been changed during this activation
-         */
-        @Setter
-        @Getter
-        boolean changed;
-        /**
-         * Whether this node is currently participating in an actor's firing
-         */
-        @Setter
-        @Getter
-        boolean active;
     }
 }

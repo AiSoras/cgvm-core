@@ -7,8 +7,6 @@ import java.util.Optional;
 public final class ObjectID {
     public static final ObjectID NOT_ATTACHED = new ObjectID("0");
 
-    private static final int SHORT_LENGTH = 6;
-
     private final String id;
 
     public ObjectID() {
@@ -35,16 +33,5 @@ public final class ObjectID {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    public String getShort() {
-        String[] parts = id.split(":");
-        String last = parts[parts.length - 1];
-        if (last.length() <= SHORT_LENGTH) {
-            return last;
-        } else {
-            return last.substring(last.length() - SHORT_LENGTH);
-        }
-
     }
 }

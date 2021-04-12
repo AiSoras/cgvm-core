@@ -1,12 +1,12 @@
 package ru.etu.cgvm.objects.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import ru.etu.cgvm.objects.nodes.Graph;
 
-import java.util.Objects;
-
+@EqualsAndHashCode
 public abstract class GraphObject {
 
     public enum Kind {
@@ -27,33 +27,6 @@ public abstract class GraphObject {
     protected GraphObject(Kind kind) {
         this.kind = kind;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GraphObject that = (GraphObject) o;
-        return id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    /**
-     * Convenience method for telling the object to tell its graph to forget it.
-     */
-    public void forgetObject() {
-        Graph g = this.getOwner();
-        g.forgetObject(this);
-    }
-
-    /**
-     * Abstract method that disconnects object from any other ru.etu.cgvm.objects. Doesn't
-     * delete from its owning graph, from Notio, or destroy itself.
-     */
-    public abstract void abandonObject();
 
     /**
      * Find the graph that is the outermost graph of the given object.
