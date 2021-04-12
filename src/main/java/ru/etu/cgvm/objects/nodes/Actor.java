@@ -13,6 +13,10 @@ public class Actor extends Node {
     private final List<Arc> inputArcs = new LinkedList<>();
     private final List<Arc> outputArcs = new LinkedList<>();
 
+    public Actor() {
+        super(Kind.ACTOR);
+    }
+
     public void addInputArc(Arc arc) {
         inputArcs.add(arc);
     }

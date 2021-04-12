@@ -12,7 +12,7 @@ public class Type {
 
     @Setter
     @Getter
-    private String name;
+    private String name = "";
     @Setter
     @Getter
     private boolean isNegated;

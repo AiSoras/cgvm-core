@@ -1,7 +1,6 @@
 package ru.etu.cgvm.objects.nodes;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.etu.cgvm.objects.Referent;
@@ -9,7 +8,6 @@ import ru.etu.cgvm.objects.base.Node;
 
 import java.util.*;
 
-@NoArgsConstructor
 @ToString
 public class Concept extends Node {
 
@@ -19,8 +17,8 @@ public class Concept extends Node {
     @Getter
     private final Collection<String> coreferenceLinks = new LinkedList<>();
 
-    public Concept(Kind kind) {
-        super(kind);
+    public Concept() {
+        super(Kind.CONCEPT);
     }
 
     public void addCoreferenceLink(String coreferenceLink) {

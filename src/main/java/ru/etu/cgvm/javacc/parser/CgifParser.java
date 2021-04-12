@@ -6,10 +6,12 @@ import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.Referent;
 import ru.etu.cgvm.objects.SignatureParameter;
 import ru.etu.cgvm.objects.Type;
+import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.base.Node;
+import ru.etu.cgvm.objects.graphs.Context;
+import ru.etu.cgvm.objects.graphs.Lambda;
 import ru.etu.cgvm.objects.nodes.Actor;
 import ru.etu.cgvm.objects.nodes.Concept;
-import ru.etu.cgvm.objects.nodes.Graph;
 import ru.etu.cgvm.objects.nodes.Relation;
 
 import java.io.ByteArrayInputStream;
@@ -19,1789 +21,1718 @@ import java.nio.charset.StandardCharsets;
 
 public class CgifParser implements CgifParserConstants {
 
-    private Graph topGraph;
+     private Context topContext;
 
-    public CgifParser() {
-        this((Reader) null);
+     public CgifParser() {
+         this((Reader) null);
+     }
+
+     public Graph parse(String content) throws ParseException {
+            InputStream is = new ByteArrayInputStream(content.getBytes());
+            ReInit(is, StandardCharsets.UTF_8.name());
+            topContext = new Context();
+            initTopLevelGraph();
+            return topContext;
+     }
+
+/* Root production. */
+  final public void initTopLevelGraph() throws ParseException {
+    trace_call("initTopLevelGraph");
+    try {
+
+      graph(null);
+    } finally {
+      trace_return("initTopLevelGraph");
     }
+}
 
-    public Graph parse(String content) throws ParseException {
-        InputStream is = new ByteArrayInputStream(content.getBytes());
-        ReInit(is, StandardCharsets.UTF_8.name());
-        topGraph = new Graph();
-        initTopLevelGraph();
-        return topGraph;
+  final public void graph(Graph enclosingGraph) throws ParseException {
+    trace_call("graph");
+    try {
+Context graph;
+    if (enclosingGraph == null) {
+        graph = topContext;
+    } else {
+        graph = new Context(enclosingGraph);
     }
-
-    /* Root production. */
-    final public void initTopLevelGraph() throws ParseException {
-        trace_call("initTopLevelGraph");
-        try {
-
-            graph(null);
-        } finally {
-            trace_return("initTopLevelGraph");
+      label_1:
+      while (true) {
+        term(graph);
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case LPAREN:
+        case LBRACKET:
+        case LESSTHAN:
+        case TILDE:{
+          break;
+          }
+        default:
+          jj_la1[0] = jj_gen;
+          break label_1;
         }
+      }
+    } finally {
+      trace_return("graph");
     }
+}
 
-    final public void graph(Graph enclosingGraph) throws ParseException {
-        trace_call("graph");
-        try {
-            Graph graph;
-            if (enclosingGraph == null) {
-                graph = topGraph;
-            } else {
-                graph = new Graph(enclosingGraph);
-            }
-            label_1:
-            while (true) {
-                term(graph);
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case LPAREN:
-                    case LBRACKET:
-                    case LESSTHAN:
-                    case TILDE: {
-                        break;
-                    }
-                    default:
-                        jj_la1[0] = jj_gen;
-                        break label_1;
-                }
-            }
-        } finally {
-            trace_return("graph");
-        }
-    }
+  final public void term(Graph g) throws ParseException {
+    trace_call("term");
+    try {
 
-    final public void term(Graph g) throws ParseException {
-        trace_call("term");
-        try {
-
-            if (jj_2_1(3)) {
-                concept(g);
-            } else {
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case LPAREN: {
-                        relation(g);
-                        break;
-                    }
-                    case LESSTHAN: {
-                        actor(g);
-                        break;
-                    }
-                    default:
-                        jj_la1[1] = jj_gen;
-                        if (jj_2_2(3)) {
-                            context(g);
-                        } else if (jj_2_3(3)) {
-                            conceptTypeHierarchy(g);
-                        } else {
-                            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                                case LBRACKET: {
-                                    relationTypeHierarchy(g);
-                                    break;
-                                }
-                                default:
-                                    jj_la1[2] = jj_gen;
-                                    jj_consume_token(-1);
-                                    throw new ParseException();
-                            }
-                        }
-                }
-            }
-        } finally {
-            trace_return("term");
-        }
-    }
-
-    final public Referent.Designation designation() throws ParseException {
-        trace_call("designation");
-        try {
-            Referent.Designation designation = new Referent.Designation();
-            Token element = null;
-            Token additionalInfo;
+      if (jj_2_1(3)) {
+        concept(g);
+      } else {
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case LPAREN:{
+          relation(g);
+          break;
+          }
+        case LESSTHAN:{
+          actor(g);
+          break;
+          }
+        default:
+          jj_la1[1] = jj_gen;
+          if (jj_2_2(3)) {
+            context(g);
+          } else if (jj_2_3(3)) {
+            conceptTypeHierarchy(g);
+          } else {
             switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case DECIMAL_LITERAL:
-                case FLOATING_POINT_LITERAL:
-                case QUOTED_STRING:
-                case ADDITIONAL_INFO: {
-                    switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                        case ADDITIONAL_INFO: {
-                            additionalInfo = jj_consume_token(ADDITIONAL_INFO);
-                            designation.setAdditionalInfo(additionalInfo.image);
-                            break;
-                        }
-                        default:
-                            jj_la1[3] = jj_gen;
-                            ;
-                    }
-                    switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                        case DECIMAL_LITERAL: {
-                            element = jj_consume_token(DECIMAL_LITERAL);
-                            break;
-                        }
-                        case FLOATING_POINT_LITERAL: {
-                            element = jj_consume_token(FLOATING_POINT_LITERAL);
-                            break;
-                        }
-                        case QUOTED_STRING: {
-                            element = jj_consume_token(QUOTED_STRING);
-                            break;
-                        }
-                        default:
-                            jj_la1[4] = jj_gen;
-                            jj_consume_token(-1);
-                            throw new ParseException();
-                    }
-                    designation.setLiteral(element.image);
-                    break;
-                }
-                case POUNDSIGN:
-                case CHARACTER_LITERAL:
-                case IDENTIFIER: {
-                    switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                        case CHARACTER_LITERAL: {
-                            element = jj_consume_token(CHARACTER_LITERAL);
-                            break;
-                        }
-                        case IDENTIFIER: {
-                            element = jj_consume_token(IDENTIFIER);
-                            break;
-                        }
-                        case POUNDSIGN: {
-                            element = jj_consume_token(POUNDSIGN);
-                            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                                case DECIMAL_LITERAL: {
-                                    jj_consume_token(DECIMAL_LITERAL);
-                                    break;
-                                }
-                                case IDENTIFIER: {
-                                    jj_consume_token(IDENTIFIER);
-                                    break;
-                                }
-                                default:
-                                    jj_la1[5] = jj_gen;
-                                    jj_consume_token(-1);
-                                    throw new ParseException();
-                            }
-                            break;
-                        }
-                        default:
-                            jj_la1[6] = jj_gen;
-                            jj_consume_token(-1);
-                            throw new ParseException();
-                    }
-                    designation.setLocator(element.image);
-                    break;
-                }
-                case QUANTIFIER: {
-                    element = jj_consume_token(QUANTIFIER);
-                    designation.setQuantifier(element.image);
-                    break;
-                }
-                default:
-                    jj_la1[7] = jj_gen;
-                    jj_consume_token(-1);
-                    throw new ParseException();
+            case LBRACKET:{
+              relationTypeHierarchy(g);
+              break;
+              }
+            default:
+              jj_la1[2] = jj_gen;
+              jj_consume_token(-1);
+              throw new ParseException();
             }
-            {
-                if ("" != null) return designation;
+          }
+        }
+      }
+    } finally {
+      trace_return("term");
+    }
+}
+
+  final public Referent.Designation designation() throws ParseException {
+    trace_call("designation");
+    try {
+Referent.Designation designation = new Referent.Designation();
+    Token element = null;
+    Token additionalInfo;
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case DECIMAL_LITERAL:
+      case FLOATING_POINT_LITERAL:
+      case QUOTED_STRING:
+      case ADDITIONAL_INFO:{
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case ADDITIONAL_INFO:{
+          additionalInfo = jj_consume_token(ADDITIONAL_INFO);
+designation.setAdditionalInfo(additionalInfo.image);
+          break;
+          }
+        default:
+          jj_la1[3] = jj_gen;
+          ;
+        }
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case DECIMAL_LITERAL:{
+          element = jj_consume_token(DECIMAL_LITERAL);
+          break;
+          }
+        case FLOATING_POINT_LITERAL:{
+          element = jj_consume_token(FLOATING_POINT_LITERAL);
+          break;
+          }
+        case QUOTED_STRING:{
+          element = jj_consume_token(QUOTED_STRING);
+          break;
+          }
+        default:
+          jj_la1[4] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+designation.setLiteral(element.image);
+        break;
+        }
+      case POUNDSIGN:
+      case CHARACTER_LITERAL:
+      case IDENTIFIER:{
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case CHARACTER_LITERAL:{
+          element = jj_consume_token(CHARACTER_LITERAL);
+          break;
+          }
+        case IDENTIFIER:{
+          element = jj_consume_token(IDENTIFIER);
+          break;
+          }
+        case POUNDSIGN:{
+          element = jj_consume_token(POUNDSIGN);
+          switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+          case DECIMAL_LITERAL:{
+            jj_consume_token(DECIMAL_LITERAL);
+            break;
             }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("designation");
-        }
-    }
-
-    final public Referent.Descriptor descriptor() throws ParseException {
-        trace_call("descriptor");
-        try {
-            Referent.Descriptor descriptor = new Referent.Descriptor();
-            Token additionalInfo;
-            Token structure;
-            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case ADDITIONAL_INFO: {
-                    additionalInfo = jj_consume_token(ADDITIONAL_INFO);
-                    descriptor.setAdditionalInfo(additionalInfo.image);
-                    break;
-                }
-                default:
-                    jj_la1[8] = jj_gen;
-                    ;
+          case IDENTIFIER:{
+            jj_consume_token(IDENTIFIER);
+            break;
             }
-            structure = jj_consume_token(STRUCTURE);
-            descriptor.setStructure(structure.image);
-            {
-                if ("" != null) return descriptor;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("descriptor");
+          default:
+            jj_la1[5] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
+          break;
+          }
+        default:
+          jj_la1[6] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
         }
-    }
-
-    final public Referent referent() throws ParseException {
-        trace_call("referent");
-        try {
-            Referent referent = new Referent();
-            Referent.Descriptor descriptor = null;
-            Referent.Designation designation = null;
-            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case COLON: {
-                    jj_consume_token(COLON);
-                    if (jj_2_4(2)) {
-                        descriptor = descriptor();
-                    } else {
-                        ;
-                    }
-                    switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                        case POUNDSIGN:
-                        case DECIMAL_LITERAL:
-                        case FLOATING_POINT_LITERAL:
-                        case QUOTED_STRING:
-                        case CHARACTER_LITERAL:
-                        case ADDITIONAL_INFO:
-                        case QUANTIFIER:
-                        case IDENTIFIER: {
-                            designation = designation();
-                            break;
-                        }
-                        default:
-                            jj_la1[9] = jj_gen;
-                            ;
-                    }
-                    referent.setDescriptor(descriptor);
-                    referent.setDesignation(designation);
-                    {
-                        if ("" != null) return referent;
-                    }
-                    break;
-                }
-                case TILDE: {
-                    jj_consume_token(TILDE);
-                    referent.setNegated(true);
-                    {
-                        if ("" != null) return referent;
-                    }
-                    break;
-                }
-                default:
-                    jj_la1[10] = jj_gen;
-                    jj_consume_token(-1);
-                    throw new ParseException();
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("referent");
+designation.setLocator(element.image);
+        break;
         }
-    }
-
-    final public Concept concept(Graph enclosingGraph) throws ParseException {
-        trace_call("concept");
-        try {
-            Concept concept = new Concept();
-            Type type = null;
-            Referent referent = null;
-            Token coreferenceLink;
-            jj_consume_token(LBRACKET);
-            if (jj_2_5(2)) {
-                type = type(concept);
-            } else {
-                ;
-            }
-            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case RELATED_MARK:
-                case DEFINING_MARK: {
-                    switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                        case RELATED_MARK: {
-                            label_2:
-                            while (true) {
-                                coreferenceLink = jj_consume_token(RELATED_MARK);
-                                concept.addCoreferenceLink(coreferenceLink.image);
-                                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                                    case RELATED_MARK: {
-                                        break;
-                                    }
-                                    default:
-                                        jj_la1[11] = jj_gen;
-                                        break label_2;
-                                }
-                            }
-                            break;
-                        }
-                        case DEFINING_MARK: {
-                            coreferenceLink = jj_consume_token(DEFINING_MARK);
-                            concept.addCoreferenceLink(coreferenceLink.image);
-                            break;
-                        }
-                        default:
-                            jj_la1[12] = jj_gen;
-                            jj_consume_token(-1);
-                            throw new ParseException();
-                    }
-                    break;
-                }
-                default:
-                    jj_la1[13] = jj_gen;
-                    ;
-            }
-            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case COLON:
-                case TILDE: {
-                    referent = referent();
-                    break;
-                }
-                default:
-                    jj_la1[14] = jj_gen;
-                    ;
-            }
-            jj_consume_token(RBRACKET);
-            concept.setType(type);
-            concept.setReferent(referent);
-            enclosingGraph.addObject(concept);
-            {
-                if ("" != null) return concept;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("concept");
+      case QUANTIFIER:{
+        element = jj_consume_token(QUANTIFIER);
+designation.setQuantifier(element.image);
+        break;
         }
+      default:
+        jj_la1[7] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+{if ("" != null) return designation;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("designation");
     }
+}
 
-    final public Arc arc(Graph g) throws ParseException {
-        trace_call("arc");
-        try {
-            Arc arc = new Arc();
-            Graph context; // concept or context
-            Concept concept;
-            Token coreferenceLink;
-            if (jj_2_6(3)) {
-                concept = concept(g);
-                arc.setConcept(concept);
-            } else if (jj_2_7(3)) {
-                context = context(g);
-                arc.setContext(context);
-            } else {
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case RELATED_MARK: {
-                        coreferenceLink = jj_consume_token(RELATED_MARK);
-                        arc.setCoreferenceLink(coreferenceLink.image);
-                        break;
-                    }
-                    default:
-                        jj_la1[15] = jj_gen;
-                        jj_consume_token(-1);
-                        throw new ParseException();
-                }
-            }
-            {
-                if ("" != null) return arc;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("arc");
+  final public Referent.Descriptor descriptor() throws ParseException {
+    trace_call("descriptor");
+    try {
+Referent.Descriptor descriptor = new Referent.Descriptor();
+    Token additionalInfo;
+    Token structure;
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case ADDITIONAL_INFO:{
+        additionalInfo = jj_consume_token(ADDITIONAL_INFO);
+descriptor.setAdditionalInfo(additionalInfo.image);
+        break;
         }
-    }
-
-    final public void relation(Graph enclosingGraph) throws ParseException {
-        trace_call("relation");
-        try {
-            Relation relation = new Relation();
-            Type type;
-            Arc arc;
-            jj_consume_token(LPAREN);
-            type = type(relation);
-            label_3:
-            while (true) {
-                arc = arc(enclosingGraph);
-                relation.addArc(arc);
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case LBRACKET:
-                    case TILDE:
-                    case RELATED_MARK: {
-                        break;
-                    }
-                    default:
-                        jj_la1[16] = jj_gen;
-                        break label_3;
-                }
-            }
-            jj_consume_token(RPAREN);
-            relation.setType(type);
-            enclosingGraph.addObject(relation);
-        } finally {
-            trace_return("relation");
-        }
-    }
-
-    final public void actor(Graph g) throws ParseException {
-        trace_call("actor");
-        try {
-            Actor actor = new Actor();
-            Type type;
-            Arc arc;
-            jj_consume_token(LESSTHAN);
-            type = type(g);
-            label_4:
-            while (true) {
-                arc = arc(g);
-                actor.addInputArc(arc);
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case LBRACKET:
-                    case TILDE:
-                    case RELATED_MARK: {
-                        break;
-                    }
-                    default:
-                        jj_la1[17] = jj_gen;
-                        break label_4;
-                }
-            }
-            jj_consume_token(BAR);
-            label_5:
-            while (true) {
-                arc = arc(g);
-                actor.addOutputArc(arc);
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case LBRACKET:
-                    case TILDE:
-                    case RELATED_MARK: {
-                        break;
-                    }
-                    default:
-                        jj_la1[18] = jj_gen;
-                        break label_5;
-                }
-            }
-            jj_consume_token(GREATERTHAN);
-            actor.setType(type);
-            g.addObject(actor);
-        } finally {
-            trace_return("actor");
-        }
-    }
-
-    final public Graph lambda(Graph enclosingGraph) throws ParseException {
-        trace_call("lambda");
-        try {
-            SignatureParameter signatureParameter;
-            Graph lambda = new Graph();
-            jj_consume_token(LPAREN);
-            jj_consume_token(LAMBDA);
-            jj_consume_token(LPAREN);
-            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case TILDE:
-                case IDENTIFIER: {
-                    signatureParameter = parameter(lambda);
-                    lambda.addSignatureParameter(signatureParameter);
-                    label_6:
-                    while (true) {
-                        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                            case COMMA: {
-                                break;
-                            }
-                            default:
-                                jj_la1[19] = jj_gen;
-                                break label_6;
-                        }
-                        jj_consume_token(COMMA);
-                        signatureParameter = parameter(lambda);
-                        lambda.addSignatureParameter(signatureParameter);
-                    }
-                    break;
-                }
-                default:
-                    jj_la1[20] = jj_gen;
-                    ;
-            }
-            jj_consume_token(RPAREN);
-            label_7:
-            while (true) {
-                term(lambda);
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case LPAREN:
-                    case LBRACKET:
-                    case LESSTHAN:
-                    case TILDE: {
-                        break;
-                    }
-                    default:
-                        jj_la1[21] = jj_gen;
-                        break label_7;
-                }
-            }
-            jj_consume_token(RPAREN);
-            enclosingGraph.addObject(lambda);
-            {
-                if ("" != null) return lambda;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("lambda");
-        }
-    }
-
-    final public SignatureParameter parameter(Graph g) throws ParseException {
-        trace_call("parameter");
-        try {
-            SignatureParameter signatureParameter = new SignatureParameter();
-            Type type;
-            Token variable;
-            type = type(g);
-            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case DEFINING_MARK: {
-                    variable = jj_consume_token(DEFINING_MARK);
-                    signatureParameter.setVariable(variable.image);
-                    break;
-                }
-                default:
-                    jj_la1[22] = jj_gen;
-                    ;
-            }
-            signatureParameter.setType(type);
-            {
-                if ("" != null) return signatureParameter;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("parameter");
-        }
-    }
-
-    final public Type type(Node g) throws ParseException {
-        trace_call("type");
-        try {
-            Type type = new Type();
-            Token name;
-            Token negation;
-            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case TILDE: {
-                    negation = jj_consume_token(TILDE);
-                    type.setNegated(negation.image);
-                    break;
-                }
-                default:
-                    jj_la1[23] = jj_gen;
-                    ;
-            }
-            name = jj_consume_token(IDENTIFIER);
-            type.setName(name.image);
-            {
-                if ("" != null) return type;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("type");
-        }
-    }
-
-    final public Graph context(Graph enclosingGraph) throws ParseException {
-        trace_call("context");
-        try {
-            Graph context = new Graph();
-            Token contextName;
-            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                case TILDE: {
-                    jj_consume_token(TILDE);
-                    context.setNegated(true);
-                    jj_consume_token(LBRACKET);
-                    label_8:
-                    while (true) {
-                        term(context);
-                        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                            case LPAREN:
-                            case LBRACKET:
-                            case LESSTHAN:
-                            case TILDE: {
-                                break;
-                            }
-                            default:
-                                jj_la1[24] = jj_gen;
-                                break label_8;
-                        }
-                    }
-                    jj_consume_token(RBRACKET);
-                    break;
-                }
-                case LBRACKET: {
-                    jj_consume_token(LBRACKET);
-                    contextName = jj_consume_token(IDENTIFIER);
-                    context.setContext(contextName.image);
-                    switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                        case COLON: {
-                            jj_consume_token(COLON);
-                            break;
-                        }
-                        default:
-                            jj_la1[25] = jj_gen;
-                            ;
-                    }
-                    label_9:
-                    while (true) {
-                        term(context);
-                        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                            case LPAREN:
-                            case LBRACKET:
-                            case LESSTHAN:
-                            case TILDE: {
-                                break;
-                            }
-                            default:
-                                jj_la1[26] = jj_gen;
-                                break label_9;
-                        }
-                    }
-                    jj_consume_token(RBRACKET);
-                    break;
-                }
-                default:
-                    jj_la1[27] = jj_gen;
-                    jj_consume_token(-1);
-                    throw new ParseException();
-            }
-            enclosingGraph.addObject(context);
-            {
-                if ("" != null) return context;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("context");
-        }
-    }
-
-    final public void conceptTypeHierarchy(Graph g) throws ParseException {
-        trace_call("conceptTypeHierarchy");
-        try {
-
-            jj_consume_token(LBRACKET);
-            jj_consume_token(TYPEHIERARCHY);
-            jj_consume_token(COLON);
-            label_10:
-            while (true) {
-                if (jj_2_8(2)) {
-                    conceptTypeDefinition(g);
-                } else {
-                    switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                        case LPAREN: {
-                            conceptTypeOrder(g);
-                            break;
-                        }
-                        default:
-                            jj_la1[28] = jj_gen;
-                            jj_consume_token(-1);
-                            throw new ParseException();
-                    }
-                }
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case LPAREN: {
-                        break;
-                    }
-                    default:
-                        jj_la1[29] = jj_gen;
-                        break label_10;
-                }
-            }
-            jj_consume_token(RBRACKET);
-        } finally {
-            trace_return("conceptTypeHierarchy");
-        }
-    }
-
-    final public void relationTypeHierarchy(Graph g) throws ParseException {
-        trace_call("relationTypeHierarchy");
-        try {
-
-            jj_consume_token(LBRACKET);
-            jj_consume_token(RELATIONHIERARCHY);
-            jj_consume_token(COLON);
-            label_11:
-            while (true) {
-                if (jj_2_9(2)) {
-                    relationTypeDefinition(g);
-                } else {
-                    switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                        case LPAREN: {
-                            relationTypeOrder(g);
-                            break;
-                        }
-                        default:
-                            jj_la1[30] = jj_gen;
-                            jj_consume_token(-1);
-                            throw new ParseException();
-                    }
-                }
-                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
-                    case LPAREN: {
-                        break;
-                    }
-                    default:
-                        jj_la1[31] = jj_gen;
-                        break label_11;
-                }
-            }
-            jj_consume_token(RBRACKET);
-        } finally {
-            trace_return("relationTypeHierarchy");
-        }
-    }
-
-    final public void conceptTypeDefinition(Graph g) throws ParseException {
-        trace_call("conceptTypeDefinition");
-        try {
-            Graph definition;
-            String typeName;
-            jj_consume_token(LPAREN);
-            jj_consume_token(DEF);
-            typeName = conceptTypeLabel();
-            definition = lambdaExpression(g);
-            jj_consume_token(RPAREN);
-            g.getTypeHierarchy().addTypeDefinition(typeName, definition);
-        } finally {
-            trace_return("conceptTypeDefinition");
-        }
-    }
-
-    final public void relationTypeDefinition(Graph g) throws ParseException {
-        trace_call("relationTypeDefinition");
-        try {
-            Graph definition;
-            String typeName;
-            jj_consume_token(LPAREN);
-            jj_consume_token(DEF);
-            typeName = relationTypeLabel();
-            definition = lambdaExpression(g);
-            jj_consume_token(RPAREN);
-            g.getTypeHierarchy().addTypeDefinition(typeName, definition);
-        } finally {
-            trace_return("relationTypeDefinition");
-        }
-    }
-
-    final public String conceptTypeLabel() throws ParseException {
-        trace_call("conceptTypeLabel");
-        try {
-            Token typeName;
-            jj_consume_token(LBRACKET);
-            jj_consume_token(TYPELABEL);
-            jj_consume_token(COLON);
-            typeName = jj_consume_token(IDENTIFIER);
-            jj_consume_token(RBRACKET);
-            {
-                if ("" != null) return typeName.image;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("conceptTypeLabel");
-        }
-    }
-
-    final public String relationTypeLabel() throws ParseException {
-        trace_call("relationTypeLabel");
-        try {
-            Token typeName;
-            jj_consume_token(LBRACKET);
-            jj_consume_token(RELATIONLABEL);
-            jj_consume_token(COLON);
-            typeName = jj_consume_token(IDENTIFIER);
-            jj_consume_token(RBRACKET);
-            {
-                if ("" != null) return typeName.image;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("relationTypeLabel");
-        }
-    }
-
-    final public Graph lambdaExpression(Graph g) throws ParseException {
-        trace_call("lambdaExpression");
-        try {
-            Graph definition;
-            jj_consume_token(LBRACKET);
-            jj_consume_token(LAMBDAEXPRESSION);
-            jj_consume_token(COLON);
-            definition = lambda(g);
-            jj_consume_token(RBRACKET);
-            {
-                if ("" != null) return definition;
-            }
-            throw new IllegalStateException("Missing return statement in function");
-        } finally {
-            trace_return("lambdaExpression");
-        }
-    }
-
-    final public void conceptTypeOrder(Graph g) throws ParseException {
-        trace_call("conceptTypeOrder");
-        try {
-            String firstType;
-            String secondType;
-            Token order;
-            jj_consume_token(LPAREN);
-            order = jj_consume_token(ORDER);
-            firstType = conceptTypeLabel();
-            secondType = conceptTypeLabel();
-            jj_consume_token(RPAREN);
-            g.getTypeHierarchy().addTypeOrder(firstType, secondType, order.image);
-        } finally {
-            trace_return("conceptTypeOrder");
-        }
-    }
-
-    final public void relationTypeOrder(Graph g) throws ParseException {
-        trace_call("relationTypeOrder");
-        try {
-            String firstType;
-            String secondType;
-            Token order;
-            jj_consume_token(LPAREN);
-            order = jj_consume_token(ORDER);
-            firstType = relationTypeLabel();
-            secondType = relationTypeLabel();
-            jj_consume_token(RPAREN);
-            g.getTypeHierarchy().addTypeOrder(firstType, secondType, order.image);
-        } finally {
-            trace_return("relationTypeOrder");
-        }
-    }
-
-    private boolean jj_2_1(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_1());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(0, xla);
-        }
-    }
-
-    private boolean jj_2_2(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_2());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(1, xla);
-        }
-    }
-
-    private boolean jj_2_3(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_3());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(2, xla);
-        }
-    }
-
-    private boolean jj_2_4(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_4());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(3, xla);
-        }
-    }
-
-    private boolean jj_2_5(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_5());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(4, xla);
-        }
-    }
-
-    private boolean jj_2_6(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_6());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(5, xla);
-        }
-    }
-
-    private boolean jj_2_7(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_7());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(6, xla);
-        }
-    }
-
-    private boolean jj_2_8(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_8());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(7, xla);
-        }
-    }
-
-    private boolean jj_2_9(int xla) {
-        jj_la = xla;
-        jj_scanpos = token;
-        jj_lastpos = token;
-        try {
-            return (!jj_3_9());
-        } catch (LookaheadSuccess ls) {
-            return true;
-        } finally {
-            jj_save(8, xla);
-        }
-    }
-
-    private boolean jj_3R_39() {
-        if (jj_scan_token(LPAREN)) return true;
-        return false;
-    }
-
-    private boolean jj_3_2() {
-        if (jj_3R_13()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_27() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_31()) {
-            jj_scanpos = xsp;
-            if (jj_3R_32()) return true;
-        }
-        return false;
-    }
-
-    private boolean jj_3R_31() {
-        if (jj_scan_token(COLON)) return true;
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3_4()) jj_scanpos = xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_34()) jj_scanpos = xsp;
-        return false;
-    }
-
-    private boolean jj_3R_18() {
-        if (jj_scan_token(LPAREN)) return true;
-        if (jj_scan_token(DEF)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_37() {
-        if (jj_3R_41()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_32() {
-        if (jj_scan_token(TILDE)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_16() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_24()) jj_scanpos = xsp;
-        if (jj_scan_token(IDENTIFIER)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_24() {
-        if (jj_scan_token(TILDE)) return true;
-        return false;
-    }
-
-    private boolean jj_3_4() {
-        if (jj_3R_15()) return true;
-        return false;
-    }
-
-    private boolean jj_3_1() {
-        if (jj_3R_12()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_33() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3_1()) {
-            jj_scanpos = xsp;
-            if (jj_3R_35()) {
-                jj_scanpos = xsp;
-                if (jj_3R_36()) {
-                    jj_scanpos = xsp;
-                    if (jj_3_2()) {
-                        jj_scanpos = xsp;
-                        if (jj_3_3()) {
-                            jj_scanpos = xsp;
-                            if (jj_3R_37()) return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean jj_3R_40() {
-        if (jj_scan_token(LESSTHAN)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_12() {
-        if (jj_scan_token(LBRACKET)) return true;
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3_5()) jj_scanpos = xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_19()) jj_scanpos = xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_20()) jj_scanpos = xsp;
-        if (jj_scan_token(RBRACKET)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_19() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_25()) {
-            jj_scanpos = xsp;
-            if (jj_3R_26()) return true;
-        }
-        return false;
-    }
-
-    private boolean jj_3R_25() {
-        Token xsp;
-        if (jj_3R_30()) return true;
-        while (true) {
-            xsp = jj_scanpos;
-            if (jj_3R_30()) {
-                jj_scanpos = xsp;
-                break;
-            }
-        }
-        return false;
-    }
-
-    private boolean jj_3R_13() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_21()) {
-            jj_scanpos = xsp;
-            if (jj_3R_22()) return true;
-        }
-        return false;
-    }
-
-    private boolean jj_3R_30() {
-        if (jj_scan_token(RELATED_MARK)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_38() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_42()) {
-            jj_scanpos = xsp;
-            if (jj_3R_43()) {
-                jj_scanpos = xsp;
-                if (jj_3R_44()) return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean jj_3R_21() {
-        if (jj_scan_token(TILDE)) return true;
-        if (jj_scan_token(LBRACKET)) return true;
-        Token xsp;
-        if (jj_3R_28()) return true;
-        while (true) {
-            xsp = jj_scanpos;
-            if (jj_3R_28()) {
-                jj_scanpos = xsp;
-                break;
-            }
-        }
-        return false;
-    }
-
-    private boolean jj_3R_42() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_45()) jj_scanpos = xsp;
-        xsp = jj_scanpos;
-        if (jj_scan_token(38)) {
-            jj_scanpos = xsp;
-            if (jj_scan_token(39)) {
-                jj_scanpos = xsp;
-                if (jj_scan_token(41)) return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean jj_3R_45() {
-        if (jj_scan_token(ADDITIONAL_INFO)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_46() {
-        if (jj_scan_token(POUNDSIGN)) return true;
-        return false;
-    }
-
-    private boolean jj_3_3() {
-        if (jj_3R_14()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_20() {
-        if (jj_3R_27()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_22() {
-        if (jj_scan_token(LBRACKET)) return true;
-        if (jj_scan_token(IDENTIFIER)) return true;
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_scan_token(14)) jj_scanpos = xsp;
-        if (jj_3R_29()) return true;
-        while (true) {
-            xsp = jj_scanpos;
-            if (jj_3R_29()) {
-                jj_scanpos = xsp;
-                break;
-            }
-        }
-        return false;
-    }
-
-    private boolean jj_3R_26() {
-        if (jj_scan_token(DEFINING_MARK)) return true;
-        return false;
-    }
-
-    private boolean jj_3_5() {
-        if (jj_3R_16()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_43() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_scan_token(42)) {
-            jj_scanpos = xsp;
-            if (jj_scan_token(49)) {
-                jj_scanpos = xsp;
-                if (jj_3R_46()) return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean jj_3R_44() {
-        if (jj_scan_token(QUANTIFIER)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_28() {
-        if (jj_3R_33()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_14() {
-        if (jj_scan_token(LBRACKET)) return true;
-        if (jj_scan_token(TYPEHIERARCHY)) return true;
-        if (jj_scan_token(COLON)) return true;
-        return false;
-    }
-
-    private boolean jj_3_8() {
-        if (jj_3R_17()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_35() {
-        if (jj_3R_39()) return true;
-        return false;
-    }
-
-    private boolean jj_3_6() {
-        if (jj_3R_12()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_29() {
-        if (jj_3R_33()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_41() {
-        if (jj_scan_token(LBRACKET)) return true;
-        return false;
-    }
-
-    private boolean jj_3_9() {
-        if (jj_3R_18()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_15() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_23()) jj_scanpos = xsp;
-        if (jj_scan_token(STRUCTURE)) return true;
-        return false;
-    }
-
-    private boolean jj_3_7() {
-        if (jj_3R_13()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_23() {
-        if (jj_scan_token(ADDITIONAL_INFO)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_34() {
-        if (jj_3R_38()) return true;
-        return false;
-    }
-
-    private boolean jj_3R_17() {
-        if (jj_scan_token(LPAREN)) return true;
-        if (jj_scan_token(DEF)) return true;
-        return false;
-    }
-
-    private boolean jj_3R_36() {
-        if (jj_3R_40()) return true;
-        return false;
-    }
-
-    /**
-     * Generated Token Manager.
-     */
-    public CgifParserTokenManager token_source;
-    SimpleCharStream jj_input_stream;
-    /**
-     * Current token.
-     */
-    public Token token;
-    /**
-     * Next token.
-     */
-    public Token jj_nt;
-    private int jj_ntk;
-    private Token jj_scanpos, jj_lastpos;
-    private int jj_la;
-    private int jj_gen;
-    final private int[] jj_la1 = new int[32];
-    static private int[] jj_la1_0;
-    static private int[] jj_la1_1;
-
-    static {
-        jj_la1_init_0();
-        jj_la1_init_1();
-    }
-
-    private static void jj_la1_init_0() {
-        jj_la1_0 = new int[]{0x20401400, 0x400400, 0x1000, 0x0, 0x0, 0x0, 0x100000, 0x100000, 0x0, 0x100000, 0x20004000, 0x0, 0x0, 0x0, 0x20004000, 0x0, 0x20001000, 0x20001000, 0x20001000, 0x20000, 0x20000000, 0x20401400, 0x0, 0x20000000, 0x20401400, 0x4000, 0x20401400, 0x20001000, 0x400, 0x400, 0x400, 0x400,};
-    }
-
-    private static void jj_la1_init_1() {
-        jj_la1_1 = new int[]{0x0, 0x0, 0x0, 0x800, 0x2c0, 0x20040, 0x20400, 0x21ec0, 0x800, 0x21ec0, 0x0, 0x40000, 0xc0000, 0xc0000, 0x0, 0x40000, 0x40000, 0x40000, 0x40000, 0x0, 0x20000, 0x0, 0x80000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,};
-    }
-
-    private final JJCalls[] jj_2_rtns = new JJCalls[9];
-    private boolean jj_rescan = false;
-    private int jj_gc = 0;
-
-    /**
-     * Constructor with InputStream.
-     *
-     * @param stream input stream
-     */
-    public CgifParser(final java.io.InputStream stream) {
-        this(stream, null);
-    }
-
-    /**
-     * Constructor with InputStream and supplied encoding
-     *
-     * @param stream   input stream
-     * @param encoding charset to be used
-     */
-    public CgifParser(final java.io.InputStream stream, final String encoding) {
-        try {
-            jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1);
-        } catch (final java.io.UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
-        token_source = new CgifParserTokenManager(jj_input_stream);
-        token = new Token();
-        jj_ntk = -1;
-        jj_gen = 0;
-        for (int i = 0; i < 32; i++) jj_la1[i] = -1;
-        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-    }
-
-    /**
-     * Reinitialise
-     *
-     * @param stream input stream
-     */
-    public void ReInit(final java.io.InputStream stream) {
-        ReInit(stream, null);
-    }
-
-    /**
-     * Reinitialise
-     *
-     * @param stream   input stream
-     * @param encoding charset to be used
-     */
-    public void ReInit(final java.io.InputStream stream, final String encoding) {
-        try {
-            jj_input_stream.reInit(stream, encoding, 1, 1);
-        } catch (final java.io.UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
-        token_source.ReInit(jj_input_stream);
-        token = new Token();
-        jj_ntk = -1;
-        jj_gen = 0;
-        for (int i = 0; i < 32; i++) jj_la1[i] = -1;
-        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-    }
-
-    /**
-     * Constructor with InputStream.
-     *
-     * @param stream char stream
-     */
-    public CgifParser(final java.io.Reader stream) {
-        jj_input_stream = new SimpleCharStream(stream, 1, 1);
-        token_source = new CgifParserTokenManager(jj_input_stream);
-        token = new Token();
-        jj_ntk = -1;
-        jj_gen = 0;
-        for (int i = 0; i < 32; i++)
-            jj_la1[i] = -1;
-        for (int i = 0; i < jj_2_rtns.length; i++)
-            jj_2_rtns[i] = new JJCalls();
-    }
-
-    /**
-     * Reinitialise
-     *
-     * @param stream char stream
-     */
-    public void ReInit(final java.io.Reader stream) {
-        if (jj_input_stream == null) {
-            jj_input_stream = new SimpleCharStream(stream, 1, 1);
+      default:
+        jj_la1[8] = jj_gen;
+        ;
+      }
+      structure = jj_consume_token(STRUCTURE);
+descriptor.setStructure(structure.image);
+        {if ("" != null) return descriptor;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("descriptor");
+    }
+}
+
+  final public Referent referent() throws ParseException {
+    trace_call("referent");
+    try {
+Referent referent = new Referent();
+    Referent.Descriptor descriptor = null;
+    Referent.Designation designation = null;
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case COLON:{
+        jj_consume_token(COLON);
+        if (jj_2_4(2)) {
+          descriptor = descriptor();
         } else {
-            jj_input_stream.reInit(stream, 1, 1);
+          ;
         }
-        if (token_source == null) {
-            token_source = new CgifParserTokenManager(jj_input_stream);
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case POUNDSIGN:
+        case DECIMAL_LITERAL:
+        case FLOATING_POINT_LITERAL:
+        case QUOTED_STRING:
+        case CHARACTER_LITERAL:
+        case ADDITIONAL_INFO:
+        case QUANTIFIER:
+        case IDENTIFIER:{
+          designation = designation();
+          break;
+          }
+        default:
+          jj_la1[9] = jj_gen;
+          ;
         }
-
-        token_source.ReInit(jj_input_stream);
-        token = new Token();
-        jj_ntk = -1;
-        jj_gen = 0;
-        for (int i = 0; i < 32; i++)
-            jj_la1[i] = -1;
-        for (int i = 0; i < jj_2_rtns.length; i++)
-            jj_2_rtns[i] = new JJCalls();
-    }
-
-    /**
-     * Constructor with generated Token Manager.
-     *
-     * @param tm Token manager to use
-     */
-    public CgifParser(final CgifParserTokenManager tm) {
-        token_source = tm;
-        token = new Token();
-        jj_ntk = -1;
-        jj_gen = 0;
-        for (int i = 0; i < 32; i++) jj_la1[i] = -1;
-        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-    }
-
-    /**
-     * Reinitialise
-     *
-     * @param tm Token manager to use
-     */
-    public void ReInit(final CgifParserTokenManager tm) {
-        token_source = tm;
-        token = new Token();
-        jj_ntk = -1;
-        jj_gen = 0;
-        for (int i = 0; i < 32; i++) jj_la1[i] = -1;
-        for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
-    }
-
-    private Token jj_consume_token(final int kind) throws ParseException {
-        final Token oldToken = token;
-        if (token.next != null)
-            token = token.next;
-        else {
-            token.next = token_source.getNextToken();
-            token = token.next;
+referent.setDescriptor(descriptor);
+        referent.setDesignation(designation);
+        {if ("" != null) return referent;}
+        break;
         }
-        jj_ntk = -1;
-        if (token.kind == kind) {
-            jj_gen++;
-            if (++jj_gc > 100) {
-                jj_gc = 0;
-                for (int i = 0; i < jj_2_rtns.length; i++) {
-                    JJCalls c = jj_2_rtns[i];
-                    while (c != null) {
-                        if (c.gen < jj_gen)
-                            c.first = null;
-                        c = c.next;
-                    }
-                }
+      case TILDE:{
+        jj_consume_token(TILDE);
+referent.setNegated(true);
+        {if ("" != null) return referent;}
+        break;
+        }
+      default:
+        jj_la1[10] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("referent");
+    }
+}
+
+  final public Concept concept(Graph enclosingGraph) throws ParseException {
+    trace_call("concept");
+    try {
+Concept concept = new Concept();
+    Type type = null;
+    Referent referent = null;
+    Token coreferenceLink;
+      jj_consume_token(LBRACKET);
+      if (jj_2_5(2)) {
+        type = type();
+      } else {
+        ;
+      }
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case RELATED_MARK:
+      case DEFINING_MARK:{
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case RELATED_MARK:{
+          label_2:
+          while (true) {
+            coreferenceLink = jj_consume_token(RELATED_MARK);
+concept.addCoreferenceLink(coreferenceLink.image);
+            switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+            case RELATED_MARK:{
+              break;
+              }
+            default:
+              jj_la1[11] = jj_gen;
+              break label_2;
             }
-            trace_token(token, "");
-            return token;
+          }
+          break;
+          }
+        case DEFINING_MARK:{
+          coreferenceLink = jj_consume_token(DEFINING_MARK);
+concept.addCoreferenceLink(coreferenceLink.image);
+          break;
+          }
+        default:
+          jj_la1[12] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
         }
-        token = oldToken;
-        jj_kind = kind;
-        throw generateParseException();
+        break;
+        }
+      default:
+        jj_la1[13] = jj_gen;
+        ;
+      }
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case COLON:
+      case TILDE:{
+        referent = referent();
+        break;
+        }
+      default:
+        jj_la1[14] = jj_gen;
+        ;
+      }
+      jj_consume_token(RBRACKET);
+concept.setType(type);
+        concept.setReferent(referent);
+        enclosingGraph.addObject(concept);
+        {if ("" != null) return concept;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("concept");
     }
+}
 
-    private static final class LookaheadSuccess extends IllegalStateException {
+  final public Arc arc(Graph g) throws ParseException {
+    trace_call("arc");
+    try {
+Arc arc = new Arc();
+    Graph context; // concept or context
+    Concept concept;
+    Token coreferenceLink;
+      if (jj_2_6(3)) {
+        concept = concept(g);
+arc.setConcept(concept);
+      } else if (jj_2_7(3)) {
+        context = context(g);
+arc.setContext(context);
+      } else {
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case RELATED_MARK:{
+          coreferenceLink = jj_consume_token(RELATED_MARK);
+arc.setCoreferenceLink(coreferenceLink.image);
+          break;
+          }
+        default:
+          jj_la1[15] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+      }
+{if ("" != null) return arc;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("arc");
     }
+}
 
-    private final LookaheadSuccess jj_ls = new LookaheadSuccess();
+  final public void relation(Graph enclosingGraph) throws ParseException {
+    trace_call("relation");
+    try {
+Relation relation = new Relation();
+    Type type;
+    Arc arc;
+      jj_consume_token(LPAREN);
+      type = type();
+      label_3:
+      while (true) {
+        arc = arc(enclosingGraph);
+relation.addArc(arc);
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case LBRACKET:
+        case TILDE:
+        case RELATED_MARK:{
+          break;
+          }
+        default:
+          jj_la1[16] = jj_gen;
+          break label_3;
+        }
+      }
+      jj_consume_token(RPAREN);
+relation.setType(type);
+        enclosingGraph.addObject(relation);
+    } finally {
+      trace_return("relation");
+    }
+}
 
-    private boolean jj_scan_token(int kind) {
-        if (jj_scanpos == jj_lastpos) {
-            jj_la--;
-            if (jj_scanpos.next == null) {
-                jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
-            } else {
-                jj_lastpos = jj_scanpos = jj_scanpos.next;
+  final public void actor(Graph g) throws ParseException {
+    trace_call("actor");
+    try {
+Actor actor = new Actor();
+    Type type;
+    Arc arc;
+      jj_consume_token(LESSTHAN);
+      type = type();
+      label_4:
+      while (true) {
+        arc = arc(g);
+actor.addInputArc(arc);
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case LBRACKET:
+        case TILDE:
+        case RELATED_MARK:{
+          break;
+          }
+        default:
+          jj_la1[17] = jj_gen;
+          break label_4;
+        }
+      }
+      jj_consume_token(BAR);
+      label_5:
+      while (true) {
+        arc = arc(g);
+actor.addOutputArc(arc);
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case LBRACKET:
+        case TILDE:
+        case RELATED_MARK:{
+          break;
+          }
+        default:
+          jj_la1[18] = jj_gen;
+          break label_5;
+        }
+      }
+      jj_consume_token(GREATERTHAN);
+actor.setType(type);
+        g.addObject(actor);
+    } finally {
+      trace_return("actor");
+    }
+}
+
+  final public Lambda lambda(Graph enclosingGraph) throws ParseException {
+    trace_call("lambda");
+    try {
+SignatureParameter signatureParameter;
+    Lambda lambda = new Lambda();
+      jj_consume_token(LPAREN);
+      jj_consume_token(LAMBDA);
+      jj_consume_token(LPAREN);
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case TILDE:
+      case IDENTIFIER:{
+        signatureParameter = parameter();
+lambda.addSignatureParameter(signatureParameter);
+        label_6:
+        while (true) {
+          switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+          case COMMA:{
+            break;
             }
+          default:
+            jj_la1[19] = jj_gen;
+            break label_6;
+          }
+          jj_consume_token(COMMA);
+          signatureParameter = parameter();
+lambda.addSignatureParameter(signatureParameter);
+        }
+        break;
+        }
+      default:
+        jj_la1[20] = jj_gen;
+        ;
+      }
+      jj_consume_token(RPAREN);
+      label_7:
+      while (true) {
+        term(lambda);
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case LPAREN:
+        case LBRACKET:
+        case LESSTHAN:
+        case TILDE:{
+          break;
+          }
+        default:
+          jj_la1[21] = jj_gen;
+          break label_7;
+        }
+      }
+      jj_consume_token(RPAREN);
+enclosingGraph.addObject(lambda);
+        {if ("" != null) return lambda;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("lambda");
+    }
+}
+
+  final public SignatureParameter parameter() throws ParseException {
+    trace_call("parameter");
+    try {
+SignatureParameter signatureParameter = new SignatureParameter();
+    Type type;
+    Token variable;
+      type = type();
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case DEFINING_MARK:{
+        variable = jj_consume_token(DEFINING_MARK);
+signatureParameter.setVariable(variable.image);
+        break;
+        }
+      default:
+        jj_la1[22] = jj_gen;
+        ;
+      }
+signatureParameter.setType(type);
+        {if ("" != null) return signatureParameter;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("parameter");
+    }
+}
+
+  final public Type type() throws ParseException {
+    trace_call("type");
+    try {
+Type type = new Type();
+    Token name;
+    Token negation;
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case TILDE:{
+        negation = jj_consume_token(TILDE);
+type.setNegated(negation.image);
+        break;
+        }
+      default:
+        jj_la1[23] = jj_gen;
+        ;
+      }
+      name = jj_consume_token(IDENTIFIER);
+type.setName(name.image);
+        {if ("" != null) return type;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("type");
+    }
+}
+
+  final public Graph context(Graph enclosingGraph) throws ParseException {
+    trace_call("context");
+    try {
+Context context = new Context();
+    Token contextName;
+      switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+      case TILDE:{
+        jj_consume_token(TILDE);
+context.setNegated(true);
+        jj_consume_token(LBRACKET);
+        label_8:
+        while (true) {
+          term(context);
+          switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+          case LPAREN:
+          case LBRACKET:
+          case LESSTHAN:
+          case TILDE:{
+            break;
+            }
+          default:
+            jj_la1[24] = jj_gen;
+            break label_8;
+          }
+        }
+        jj_consume_token(RBRACKET);
+        break;
+        }
+      case LBRACKET:{
+        jj_consume_token(LBRACKET);
+        contextName = jj_consume_token(IDENTIFIER);
+context.setName(contextName.image);
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case COLON:{
+          jj_consume_token(COLON);
+          break;
+          }
+        default:
+          jj_la1[25] = jj_gen;
+          ;
+        }
+        label_9:
+        while (true) {
+          term(context);
+          switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+          case LPAREN:
+          case LBRACKET:
+          case LESSTHAN:
+          case TILDE:{
+            break;
+            }
+          default:
+            jj_la1[26] = jj_gen;
+            break label_9;
+          }
+        }
+        jj_consume_token(RBRACKET);
+        break;
+        }
+      default:
+        jj_la1[27] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+enclosingGraph.addObject(context);
+        {if ("" != null) return context;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("context");
+    }
+}
+
+  final public void conceptTypeHierarchy(Graph g) throws ParseException {
+    trace_call("conceptTypeHierarchy");
+    try {
+
+      jj_consume_token(LBRACKET);
+      jj_consume_token(TYPEHIERARCHY);
+      jj_consume_token(COLON);
+      label_10:
+      while (true) {
+        if (jj_2_8(2)) {
+          conceptTypeDefinition(g);
         } else {
-            jj_scanpos = jj_scanpos.next;
-        }
-        if (jj_rescan) {
-            int i = 0;
-            Token tok = token;
-            while (tok != null && tok != jj_scanpos) {
-                i++;
-                tok = tok.next;
+          switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+          case LPAREN:{
+            conceptTypeOrder(g);
+            break;
             }
-            if (tok != null) jj_add_error_token(kind, i);
+          default:
+            jj_la1[28] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
         }
-        if (jj_scanpos.kind != kind) return true;
-        if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
-        return false;
-    }
-
-
-    /**
-     * @return the next Token.
-     */
-    public final Token getNextToken() {
-        if (token.next != null)
-            token = token.next;
-        else
-            token = token.next = token_source.getNextToken();
-        jj_ntk = -1;
-        jj_gen++;
-        trace_token(token, " (in getNextToken)");
-        return token;
-    }
-
-    /**
-     * @param index index to be retrieved
-     * @return the specific Token.
-     */
-    public final Token getToken(final int index) {
-        Token t = token;
-        for (int i = 0; i < index; i++) {
-            if (t.next == null)
-                t.next = token_source.getNextToken();
-            t = t.next;
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case LPAREN:{
+          break;
+          }
+        default:
+          jj_la1[29] = jj_gen;
+          break label_10;
         }
-        return t;
+      }
+      jj_consume_token(RBRACKET);
+    } finally {
+      trace_return("conceptTypeHierarchy");
     }
+}
 
-    private int jj_ntk_f() {
-        jj_nt = token.next;
-        if (jj_nt == null) {
-            token.next = token_source.getNextToken();
-            jj_ntk = token.next.kind;
-            return jj_ntk;
-        }
-        jj_ntk = jj_nt.kind;
-        return jj_ntk;
-    }
+  final public void relationTypeHierarchy(Graph g) throws ParseException {
+    trace_call("relationTypeHierarchy");
+    try {
 
-    private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
-    private int[] jj_expentry;
-    private int jj_kind = -1;
-    private int[] jj_lasttokens = new int[100];
-    private int jj_endpos;
-
-    private void jj_add_error_token(int kind, int pos) {
-        if (pos >= 100) {
-            return;
-        }
-
-        if (pos == jj_endpos + 1) {
-            jj_lasttokens[jj_endpos++] = kind;
-        } else if (jj_endpos != 0) {
-            jj_expentry = new int[jj_endpos];
-
-            for (int i = 0; i < jj_endpos; i++) {
-                jj_expentry[i] = jj_lasttokens[i];
+      jj_consume_token(LBRACKET);
+      jj_consume_token(RELATIONHIERARCHY);
+      jj_consume_token(COLON);
+      label_11:
+      while (true) {
+        if (jj_2_9(2)) {
+          relationTypeDefinition(g);
+        } else {
+          switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+          case LPAREN:{
+            relationTypeOrder(g);
+            break;
             }
-
-            for (final int[] oldentry : jj_expentries) {
-                if (oldentry.length == jj_expentry.length) {
-                    boolean isMatched = true;
-                    for (int i = 0; i < jj_expentry.length; i++) {
-                        if (oldentry[i] != jj_expentry[i]) {
-                            isMatched = false;
-                            break;
-                        }
-                    }
-                    if (isMatched) {
-                        jj_expentries.add(jj_expentry);
-                        break;
-                    }
-                }
-            }
-
-            if (pos != 0) {
-                jj_endpos = pos;
-                jj_lasttokens[jj_endpos - 1] = kind;
-            }
+          default:
+            jj_la1[30] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
         }
+        switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+        case LPAREN:{
+          break;
+          }
+        default:
+          jj_la1[31] = jj_gen;
+          break label_11;
+        }
+      }
+      jj_consume_token(RBRACKET);
+    } finally {
+      trace_return("relationTypeHierarchy");
+    }
+}
+
+  final public void conceptTypeDefinition(Graph g) throws ParseException {
+    trace_call("conceptTypeDefinition");
+    try {
+Lambda definition;
+    String typeName;
+      jj_consume_token(LPAREN);
+      jj_consume_token(DEF);
+      typeName = conceptTypeLabel();
+      definition = lambdaExpression(g);
+      jj_consume_token(RPAREN);
+g.getTypeHierarchy().addTypeDefinition(typeName, definition);
+    } finally {
+      trace_return("conceptTypeDefinition");
+    }
+}
+
+  final public void relationTypeDefinition(Graph g) throws ParseException {
+    trace_call("relationTypeDefinition");
+    try {
+Lambda definition;
+    String typeName;
+      jj_consume_token(LPAREN);
+      jj_consume_token(DEF);
+      typeName = relationTypeLabel();
+      definition = lambdaExpression(g);
+      jj_consume_token(RPAREN);
+g.getTypeHierarchy().addTypeDefinition(typeName, definition);
+    } finally {
+      trace_return("relationTypeDefinition");
+    }
+}
+
+  final public String conceptTypeLabel() throws ParseException {
+    trace_call("conceptTypeLabel");
+    try {
+Token typeName;
+      jj_consume_token(LBRACKET);
+      jj_consume_token(TYPELABEL);
+      jj_consume_token(COLON);
+      typeName = jj_consume_token(IDENTIFIER);
+      jj_consume_token(RBRACKET);
+{if ("" != null) return typeName.image;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("conceptTypeLabel");
+    }
+}
+
+  final public String relationTypeLabel() throws ParseException {
+    trace_call("relationTypeLabel");
+    try {
+Token typeName;
+      jj_consume_token(LBRACKET);
+      jj_consume_token(RELATIONLABEL);
+      jj_consume_token(COLON);
+      typeName = jj_consume_token(IDENTIFIER);
+      jj_consume_token(RBRACKET);
+{if ("" != null) return typeName.image;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("relationTypeLabel");
+    }
+}
+
+  final public Lambda lambdaExpression(Graph g) throws ParseException {
+    trace_call("lambdaExpression");
+    try {
+Lambda definition;
+      jj_consume_token(LBRACKET);
+      jj_consume_token(LAMBDAEXPRESSION);
+      jj_consume_token(COLON);
+      definition = lambda(g);
+      jj_consume_token(RBRACKET);
+{if ("" != null) return definition;}
+    throw new IllegalStateException ("Missing return statement in function");
+    } finally {
+      trace_return("lambdaExpression");
+    }
+}
+
+  final public void conceptTypeOrder(Graph g) throws ParseException {
+    trace_call("conceptTypeOrder");
+    try {
+String firstType;
+    String secondType;
+    Token order;
+      jj_consume_token(LPAREN);
+      order = jj_consume_token(ORDER);
+      firstType = conceptTypeLabel();
+      secondType = conceptTypeLabel();
+      jj_consume_token(RPAREN);
+g.getTypeHierarchy().addTypeOrder(firstType, secondType, order.image);
+    } finally {
+      trace_return("conceptTypeOrder");
+    }
+}
+
+  final public void relationTypeOrder(Graph g) throws ParseException {
+    trace_call("relationTypeOrder");
+    try {
+String firstType;
+    String secondType;
+    Token order;
+      jj_consume_token(LPAREN);
+      order = jj_consume_token(ORDER);
+      firstType = relationTypeLabel();
+      secondType = relationTypeLabel();
+      jj_consume_token(RPAREN);
+g.getTypeHierarchy().addTypeOrder(firstType, secondType, order.image);
+    } finally {
+      trace_return("relationTypeOrder");
+    }
+}
+
+  private boolean jj_2_1(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_1()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(0, xla); }
+  }
+
+  private boolean jj_2_2(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_2()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(1, xla); }
+  }
+
+  private boolean jj_2_3(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_3()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(2, xla); }
+  }
+
+  private boolean jj_2_4(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_4()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(3, xla); }
+  }
+
+  private boolean jj_2_5(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_5()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(4, xla); }
+  }
+
+  private boolean jj_2_6(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_6()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(5, xla); }
+  }
+
+  private boolean jj_2_7(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_7()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(6, xla); }
+  }
+
+  private boolean jj_2_8(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_8()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(7, xla); }
+  }
+
+  private boolean jj_2_9(int xla)
+ {
+    jj_la = xla;
+    jj_scanpos = token;
+    jj_lastpos = token;
+    try { return (!jj_3_9()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(8, xla); }
+  }
+
+  private boolean jj_3R_17()
+ {
+    if (jj_scan_token(LPAREN)) return true;
+    if (jj_scan_token(DEF)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_36()
+ {
+    if (jj_3R_40()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_39()
+ {
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_27()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_31()) {
+    jj_scanpos = xsp;
+    if (jj_3R_32()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_31()
+ {
+    if (jj_scan_token(COLON)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_4()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_34()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_18()
+ {
+    if (jj_scan_token(LPAREN)) return true;
+    if (jj_scan_token(DEF)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_37()
+ {
+    if (jj_3R_41()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_32()
+ {
+    if (jj_scan_token(TILDE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_16()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_24()) jj_scanpos = xsp;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_24()
+ {
+    if (jj_scan_token(TILDE)) return true;
+    return false;
+  }
+
+  private boolean jj_3_4()
+ {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_33()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_1()) {
+    jj_scanpos = xsp;
+    if (jj_3R_35()) {
+    jj_scanpos = xsp;
+    if (jj_3R_36()) {
+    jj_scanpos = xsp;
+    if (jj_3_2()) {
+    jj_scanpos = xsp;
+    if (jj_3_3()) {
+    jj_scanpos = xsp;
+    if (jj_3R_37()) return true;
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_40()
+ {
+    if (jj_scan_token(LESSTHAN)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12()
+ {
+    if (jj_scan_token(LBRACKET)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_5()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_19()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_20()) jj_scanpos = xsp;
+    if (jj_scan_token(RBRACKET)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_25()) {
+    jj_scanpos = xsp;
+    if (jj_3R_26()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_25()
+ {
+    Token xsp;
+    if (jj_3R_30()) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_30()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_13()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_21()) {
+    jj_scanpos = xsp;
+    if (jj_3R_22()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_30()
+ {
+    if (jj_scan_token(RELATED_MARK)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_38()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_42()) {
+    jj_scanpos = xsp;
+    if (jj_3R_43()) {
+    jj_scanpos = xsp;
+    if (jj_3R_44()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_21()
+ {
+    if (jj_scan_token(TILDE)) return true;
+    if (jj_scan_token(LBRACKET)) return true;
+    Token xsp;
+    if (jj_3R_28()) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_28()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_42()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_45()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(38)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(39)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(41)) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_45()
+ {
+    if (jj_scan_token(ADDITIONAL_INFO)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_46()
+ {
+    if (jj_scan_token(POUNDSIGN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_3()
+ {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_20()
+ {
+    if (jj_3R_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22()
+ {
+    if (jj_scan_token(LBRACKET)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(14)) jj_scanpos = xsp;
+    if (jj_3R_29()) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_29()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_26()
+ {
+    if (jj_scan_token(DEFINING_MARK)) return true;
+    return false;
+  }
+
+  private boolean jj_3_5()
+ {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_43()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(42)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(49)) {
+    jj_scanpos = xsp;
+    if (jj_3R_46()) return true;
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_44()
+ {
+    if (jj_scan_token(QUANTIFIER)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_28()
+ {
+    if (jj_3R_33()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_14()
+ {
+    if (jj_scan_token(LBRACKET)) return true;
+    if (jj_scan_token(TYPEHIERARCHY)) return true;
+    if (jj_scan_token(COLON)) return true;
+    return false;
+  }
+
+  private boolean jj_3_8()
+ {
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_35()
+ {
+    if (jj_3R_39()) return true;
+    return false;
+  }
+
+  private boolean jj_3_6()
+ {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_29()
+ {
+    if (jj_3R_33()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_41()
+ {
+    if (jj_scan_token(LBRACKET)) return true;
+    return false;
+  }
+
+  private boolean jj_3_9()
+ {
+    if (jj_3R_18()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_15()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_23()) jj_scanpos = xsp;
+    if (jj_scan_token(STRUCTURE)) return true;
+    return false;
+  }
+
+  private boolean jj_3_7()
+ {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_23()
+ {
+    if (jj_scan_token(ADDITIONAL_INFO)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_34()
+ {
+    if (jj_3R_38()) return true;
+    return false;
+  }
+
+  /** Generated Token Manager. */
+  public CgifParserTokenManager token_source;
+  SimpleCharStream jj_input_stream;
+  /** Current token. */
+  public Token token;
+  /** Next token. */
+  public Token jj_nt;
+  private int jj_ntk;
+  private Token jj_scanpos, jj_lastpos;
+  private int jj_la;
+  private int jj_gen;
+  final private int[] jj_la1 = new int[32];
+  static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
+  static {
+	   jj_la1_init_0();
+	   jj_la1_init_1();
+	}
+	private static void jj_la1_init_0() {
+	   jj_la1_0 = new int[] {0x20401400,0x400400,0x1000,0x0,0x0,0x0,0x100000,0x100000,0x0,0x100000,0x20004000,0x0,0x0,0x0,0x20004000,0x0,0x20001000,0x20001000,0x20001000,0x20000,0x20000000,0x20401400,0x0,0x20000000,0x20401400,0x4000,0x20401400,0x20001000,0x400,0x400,0x400,0x400,};
+	}
+	private static void jj_la1_init_1() {
+	   jj_la1_1 = new int[] {0x0,0x0,0x0,0x800,0x2c0,0x20040,0x20400,0x21ec0,0x800,0x21ec0,0x0,0x40000,0xc0000,0xc0000,0x0,0x40000,0x40000,0x40000,0x40000,0x0,0x20000,0x0,0x80000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+	}
+  private final JJCalls[] jj_2_rtns = new JJCalls[9];
+  private boolean jj_rescan = false;
+  private int jj_gc = 0;
+
+  /**
+   * Constructor with InputStream.
+   * @param stream input stream
+   */
+  public CgifParser(final java.io.InputStream stream) {
+	  this(stream, null);
+  }
+
+  /**
+   * Constructor with InputStream and supplied encoding
+   * @param stream input stream
+   * @param encoding charset to be used
+   */
+  public CgifParser(final java.io.InputStream stream, final String encoding) {
+   try {
+     jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1);
+   } catch(final java.io.UnsupportedEncodingException e) {
+     throw new IllegalStateException(e);
+   }
+	 token_source = new CgifParserTokenManager(jj_input_stream);
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 32; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+  }
+
+  /**
+   * Reinitialise
+   * @param stream input stream
+   */
+  public void ReInit(final java.io.InputStream stream) {
+	  ReInit(stream, null);
+  }
+  /**
+   * Reinitialise
+   * @param stream input stream
+   * @param encoding charset to be used
+   */
+  public void ReInit(final java.io.InputStream stream, final String encoding) {
+	  try {
+      jj_input_stream.reInit(stream, encoding, 1, 1);
+    } catch(final java.io.UnsupportedEncodingException e) { 
+      throw new IllegalStateException(e);
+    }
+	 token_source.ReInit(jj_input_stream);
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 32; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+  }
+
+  /**
+   * Constructor with InputStream.
+   * @param stream char stream
+   */
+  public CgifParser(final java.io.Reader stream) {
+	 jj_input_stream = new SimpleCharStream(stream, 1, 1);
+	 token_source = new CgifParserTokenManager(jj_input_stream);
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+   for (int i = 0; i < 32; i++)
+     jj_la1[i] = -1;
+   for (int i = 0; i < jj_2_rtns.length; i++)
+     jj_2_rtns[i] = new JJCalls();
+  }
+
+  /**
+   * Reinitialise
+   * @param stream char stream
+   */
+  public void ReInit(final java.io.Reader stream) {
+	if (jj_input_stream == null) {
+	  jj_input_stream = new SimpleCharStream(stream, 1, 1);
+	} else {
+	  jj_input_stream.reInit(stream, 1, 1);
+  }
+	if (token_source == null) {
+ token_source = new CgifParserTokenManager(jj_input_stream);
+	}
+
+	 token_source.ReInit(jj_input_stream);
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+   for (int i = 0; i < 32; i++)
+     jj_la1[i] = -1;
+   for (int i = 0; i < jj_2_rtns.length; i++)
+     jj_2_rtns[i] = new JJCalls();
+  }
+
+  /**
+   * Constructor with generated Token Manager.
+   * @param tm Token manager to use
+   */
+  public CgifParser(final CgifParserTokenManager tm) {
+	 token_source = tm;
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 32; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+  }
+
+  /**
+   * Reinitialise
+   * @param tm Token manager to use
+   */
+  public void ReInit(final CgifParserTokenManager tm) {
+	 token_source = tm;
+	 token = new Token();
+	 jj_ntk = -1;
+	 jj_gen = 0;
+	 for (int i = 0; i < 32; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+  }
+
+  private Token jj_consume_token(final int kind) throws ParseException {
+    final Token oldToken = token;
+    if (token.next != null)
+      token = token.next;
+    else {
+      token.next = token_source.getNextToken();
+      token = token.next;
+    }
+    jj_ntk = -1;
+    if (token.kind == kind) {
+      jj_gen++;
+      if (++jj_gc > 100) {
+        jj_gc = 0;
+        for (int i = 0; i < jj_2_rtns.length; i++) {
+          JJCalls c = jj_2_rtns[i];
+          while (c != null) {
+            if (c.gen < jj_gen)
+              c.first = null;
+            c = c.next;
+          }
+        }
+      }
+      trace_token(token, "");
+      return token;
+    }
+    token = oldToken;
+    jj_kind = kind;
+    throw generateParseException();
+  }
+
+  private static final class LookaheadSuccess extends IllegalStateException {}
+  private final LookaheadSuccess jj_ls = new LookaheadSuccess();
+  private boolean jj_scan_token(int kind) {
+	 if (jj_scanpos == jj_lastpos) {
+	   jj_la--;
+	   if (jj_scanpos.next == null) {
+		   jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
+	   } else {
+		   jj_lastpos = jj_scanpos = jj_scanpos.next;
+	   }
+	 } else {
+	   jj_scanpos = jj_scanpos.next;
+	 }
+	 if (jj_rescan) {
+	   int i = 0; Token tok = token;
+	   while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
+	   if (tok != null) jj_add_error_token(kind, i);
+	 }
+	 if (jj_scanpos.kind != kind) return true;
+	 if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+	 return false;
+  }
+
+
+  /**
+   * @return the next Token.
+   */
+  public final Token getNextToken() {
+   if (token.next != null)
+     token = token.next;
+   else
+     token = token.next = token_source.getNextToken();
+	 jj_ntk = -1;
+	 jj_gen++;
+	   trace_token(token, " (in getNextToken)");
+	 return token;
+  }
+
+  /**
+   * @param index index to be retrieved
+   * @return the specific Token.
+   */
+  public final Token getToken(final int index) {
+    Token t = token;
+    for (int i = 0; i < index; i++) {
+      if (t.next == null)
+        t.next = token_source.getNextToken();
+      t = t.next;
+    }
+    return t;
+  }
+
+  private int jj_ntk_f() {
+    jj_nt = token.next;
+    if (jj_nt == null) {
+      token.next = token_source.getNextToken();
+      jj_ntk = token.next.kind;
+      return jj_ntk;
+    }
+    jj_ntk = jj_nt.kind;
+    return jj_ntk;
+  }
+
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private int[] jj_expentry;
+  private int jj_kind = -1;
+  private int[] jj_lasttokens = new int[100];
+  private int jj_endpos;
+
+  private void jj_add_error_token(int kind, int pos) {
+  if (pos >= 100) {
+    return;
+  }
+
+  if (pos == jj_endpos + 1) {
+    jj_lasttokens[jj_endpos++] = kind;
+  } else if (jj_endpos != 0) {
+    jj_expentry = new int[jj_endpos];
+
+    for (int i = 0; i < jj_endpos; i++) {
+      jj_expentry[i] = jj_lasttokens[i];
     }
 
-    /**
-     * Generate ParseException.
-     *
-     * @return new Exception object. Never <code>null</code>
-     */
-    public ParseException generateParseException() {
-        jj_expentries.clear();
-        boolean[] la1tokens = new boolean[52];
-        if (jj_kind >= 0) {
-            la1tokens[jj_kind] = true;
-            jj_kind = -1;
+    for (final int[] oldentry : jj_expentries) {
+      if (oldentry.length == jj_expentry.length) {
+        boolean isMatched = true;
+        for (int i = 0; i < jj_expentry.length; i++) {
+          if (oldentry[i] != jj_expentry[i]) {
+            isMatched = false;
+            break;
+          }
         }
-        for (int i = 0; i < 32; i++) {
-            if (jj_la1[i] == jj_gen) {
-                for (int j = 0; j < 32; j++) {
-                    if ((jj_la1_0[i] & (1 << j)) != 0) {
-                        la1tokens[j] = true;
-                    }
-                    if ((jj_la1_1[i] & (1 << j)) != 0) {
-                        la1tokens[32 + j] = true;
-                    }
-                }
+        if (isMatched) {
+          jj_expentries.add(jj_expentry);
+          break;
+        }
+      }
+    }
+
+    if (pos != 0) {
+      jj_endpos = pos;
+      jj_lasttokens[jj_endpos - 1] = kind;
+    }
+  }
+}
+
+  /**
+   * Generate ParseException.
+   * @return new Exception object. Never <code>null</code>
+   */
+  public ParseException generateParseException() {
+    jj_expentries.clear();
+    boolean[] la1tokens = new boolean[52];
+    if (jj_kind >= 0) {
+      la1tokens[jj_kind] = true;
+      jj_kind = -1;
+    }
+    for (int i = 0; i < 32; i++) {
+      if (jj_la1[i] == jj_gen) {
+        for (int j = 0; j < 32; j++) {
+          if ((jj_la1_0[i] & (1<<j)) != 0) {
+            la1tokens[j] = true;
+          }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
+        }
+      }
+    }
+    for (int i = 0; i < 52; i++) {
+      if (la1tokens[i]) {
+        jj_expentry = new int[1];
+        jj_expentry[0] = i;
+        jj_expentries.add(jj_expentry);
+      }
+    }
+    jj_endpos = 0;
+    jj_rescan_token();
+    jj_add_error_token(0, 0);
+    int[][] exptokseq = new int[jj_expentries.size()][];
+    for (int i = 0; i < jj_expentries.size(); i++) {
+      exptokseq[i] = jj_expentries.get(i);
+    }
+    return new ParseException(token, exptokseq, tokenImage);
+  }
+
+  private int trace_indent = 0;
+  private boolean trace_enabled = true;
+
+  /**
+   * @return Trace enabled or not?
+   */
+  public final boolean trace_enabled() {
+    return trace_enabled;
+  }
+
+  /** Enable tracing. */
+  public final void enable_tracing() {
+    trace_enabled = true;
+  }
+
+  /** Disable tracing. */
+  public final void disable_tracing() {
+    trace_enabled = false;
+  }
+
+  protected java.io.PrintStream tracePS = System.out;
+
+  protected void trace_call(final String s) {
+    if (trace_enabled) {
+      for (int i = 0; i < trace_indent; i++) {
+        tracePS.print(" ");
+      }
+      tracePS.println("Call:	" + s);
+    }
+    trace_indent += 2;
+  }
+
+  protected void trace_return(String s) {
+    trace_indent -= 2;
+    if (trace_enabled) {
+      for (int i = 0; i < trace_indent; i++) { tracePS.print(" "); }
+      tracePS.println("Return: " + s);
+    }
+  }
+
+  protected void trace_token(Token t, String where) {
+    if (trace_enabled) {
+      for (int i = 0; i < trace_indent; i++) {
+        tracePS.print(" ");
+      }
+      tracePS.print("Consumed token: <" + tokenImage[t.kind]);
+      if (t.kind != 0 && !tokenImage[t.kind].equals("\"" + t.image + "\"")) {
+        tracePS.print(": \"" + TokenMgrException.addEscapes(t.image) + "\"");
+      }
+      tracePS.println(" at line " + t.beginLine + " column " + t.beginColumn + ">" + where);
+    }
+  }
+
+  protected void trace_scan(Token t1, int t2) {
+    if (trace_enabled) {
+      for (int i = 0; i < trace_indent; i++) { tracePS.print(" "); }
+      tracePS.print("Visited token: <" + tokenImage[t1.kind]);
+      if (t1.kind != 0 && !tokenImage[t1.kind].equals("\"" + t1.image + "\"")) {
+        tracePS.print(": \"" + TokenMgrException.addEscapes(t1.image) + "\"");
+      }
+      tracePS.println(" at line " + t1.beginLine + " column " + t1.beginColumn + ">; Expected token: <" + tokenImage[t2] + ">");
+    }
+  }
+
+  private void jj_rescan_token() {
+    jj_rescan = true;
+    for (int i = 0; i < 9; i++) {
+      try {
+        JJCalls p = jj_2_rtns[i];
+        do {
+          if (p.gen > jj_gen) {
+            jj_la = p.arg;
+            jj_scanpos = p.first;
+            jj_lastpos = p.first;
+            switch (i) {
+              case 0: jj_3_1(); break;
+              case 1: jj_3_2(); break;
+              case 2: jj_3_3(); break;
+              case 3: jj_3_4(); break;
+              case 4: jj_3_5(); break;
+              case 5: jj_3_6(); break;
+              case 6: jj_3_7(); break;
+              case 7: jj_3_8(); break;
+              case 8: jj_3_9(); break;
             }
-        }
-        for (int i = 0; i < 52; i++) {
-            if (la1tokens[i]) {
-                jj_expentry = new int[1];
-                jj_expentry[0] = i;
-                jj_expentries.add(jj_expentry);
-            }
-        }
-        jj_endpos = 0;
-        jj_rescan_token();
-        jj_add_error_token(0, 0);
-        int[][] exptokseq = new int[jj_expentries.size()][];
-        for (int i = 0; i < jj_expentries.size(); i++) {
-            exptokseq[i] = jj_expentries.get(i);
-        }
-        return new ParseException(token, exptokseq, tokenImage);
+          }
+          p = p.next;
+        } while (p != null);
+      } catch(LookaheadSuccess ls) { /* ignore */ }
     }
+    jj_rescan = false;
+  }
 
-    private int trace_indent = 0;
-    private boolean trace_enabled = true;
-
-    /**
-     * @return Trace enabled or not?
-     */
-    public final boolean trace_enabled() {
-        return trace_enabled;
+  private void jj_save(int index, int xla) {
+    JJCalls p = jj_2_rtns[index];
+    while (p.gen > jj_gen) {
+      if (p.next == null) {
+        p.next = new JJCalls();
+        p = p.next;
+        break;
+      }
+      p = p.next;
     }
+    p.gen = jj_gen + xla - jj_la; 
+    p.first = token;
+    p.arg = xla;
+  }
 
-    /**
-     * Enable tracing.
-     */
-    public final void enable_tracing() {
-        trace_enabled = true;
-    }
-
-    /**
-     * Disable tracing.
-     */
-    public final void disable_tracing() {
-        trace_enabled = false;
-    }
-
-    protected java.io.PrintStream tracePS = System.out;
-
-    protected void trace_call(final String s) {
-        if (trace_enabled) {
-            for (int i = 0; i < trace_indent; i++) {
-                tracePS.print(" ");
-            }
-            tracePS.println("Call:	" + s);
-        }
-        trace_indent += 2;
-    }
-
-    protected void trace_return(String s) {
-        trace_indent -= 2;
-        if (trace_enabled) {
-            for (int i = 0; i < trace_indent; i++) {
-                tracePS.print(" ");
-            }
-            tracePS.println("Return: " + s);
-        }
-    }
-
-    protected void trace_token(Token t, String where) {
-        if (trace_enabled) {
-            for (int i = 0; i < trace_indent; i++) {
-                tracePS.print(" ");
-            }
-            tracePS.print("Consumed token: <" + tokenImage[t.kind]);
-            if (t.kind != 0 && !tokenImage[t.kind].equals("\"" + t.image + "\"")) {
-                tracePS.print(": \"" + TokenMgrException.addEscapes(t.image) + "\"");
-            }
-            tracePS.println(" at line " + t.beginLine + " column " + t.beginColumn + ">" + where);
-        }
-    }
-
-    protected void trace_scan(Token t1, int t2) {
-        if (trace_enabled) {
-            for (int i = 0; i < trace_indent; i++) {
-                tracePS.print(" ");
-            }
-            tracePS.print("Visited token: <" + tokenImage[t1.kind]);
-            if (t1.kind != 0 && !tokenImage[t1.kind].equals("\"" + t1.image + "\"")) {
-                tracePS.print(": \"" + TokenMgrException.addEscapes(t1.image) + "\"");
-            }
-            tracePS.println(" at line " + t1.beginLine + " column " + t1.beginColumn + ">; Expected token: <" + tokenImage[t2] + ">");
-        }
-    }
-
-    private void jj_rescan_token() {
-        jj_rescan = true;
-        for (int i = 0; i < 9; i++) {
-            try {
-                JJCalls p = jj_2_rtns[i];
-                do {
-                    if (p.gen > jj_gen) {
-                        jj_la = p.arg;
-                        jj_scanpos = p.first;
-                        jj_lastpos = p.first;
-                        switch (i) {
-                            case 0:
-                                jj_3_1();
-                                break;
-                            case 1:
-                                jj_3_2();
-                                break;
-                            case 2:
-                                jj_3_3();
-                                break;
-                            case 3:
-                                jj_3_4();
-                                break;
-                            case 4:
-                                jj_3_5();
-                                break;
-                            case 5:
-                                jj_3_6();
-                                break;
-                            case 6:
-                                jj_3_7();
-                                break;
-                            case 7:
-                                jj_3_8();
-                                break;
-                            case 8:
-                                jj_3_9();
-                                break;
-                        }
-                    }
-                    p = p.next;
-                } while (p != null);
-            } catch (LookaheadSuccess ls) { /* ignore */ }
-        }
-        jj_rescan = false;
-    }
-
-    private void jj_save(int index, int xla) {
-        JJCalls p = jj_2_rtns[index];
-        while (p.gen > jj_gen) {
-            if (p.next == null) {
-                p.next = new JJCalls();
-                p = p.next;
-                break;
-            }
-            p = p.next;
-        }
-        p.gen = jj_gen + xla - jj_la;
-        p.first = token;
-        p.arg = xla;
-    }
-
-    static final class JJCalls {
-        int gen;
-        Token first;
-        int arg;
-        JJCalls next;
-    }
+  static final class JJCalls {
+	 int gen;
+	 Token first;
+	 int arg;
+	 JJCalls next;
+  }
 
 }

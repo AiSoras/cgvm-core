@@ -1,11 +1,11 @@
 package ru.etu.cgvm.objects;
 
 import lombok.ToString;
+import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.nodes.Concept;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.etu.cgvm.objects.nodes.Graph;
 
 import java.util.Optional;
 

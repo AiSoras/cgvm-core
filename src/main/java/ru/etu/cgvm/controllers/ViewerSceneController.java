@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import ru.etu.cgvm.GraphViewer;
 import ru.etu.cgvm.javacc.parser.CgifParser;
 import ru.etu.cgvm.javacc.parser.ParseException;
-import ru.etu.cgvm.objects.nodes.Graph;
+import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.utils.SettingManager;
 
 import java.io.File;
