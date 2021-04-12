@@ -2,6 +2,7 @@ package ru.etu.cgvm.objects.base;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ru.etu.cgvm.objects.Edge;
 import ru.etu.cgvm.objects.Type;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@ToString
 public abstract class Node extends GraphObject {
 
     @Getter

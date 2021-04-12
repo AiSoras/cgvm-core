@@ -1,5 +1,6 @@
 package ru.etu.cgvm.objects;
 
+import lombok.ToString;
 import ru.etu.cgvm.objects.nodes.Graph;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.LinkedList;
 import java.util.List;
 
+@ToString
 @NoArgsConstructor
 public class TypeHierarchy {
 

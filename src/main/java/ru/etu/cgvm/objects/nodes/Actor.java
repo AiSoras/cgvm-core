@@ -1,11 +1,13 @@
 package ru.etu.cgvm.objects.nodes;
 
+import lombok.ToString;
 import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.base.Node;
 
 import java.util.LinkedList;
 import java.util.List;
 
+@ToString
 public class Actor extends Node {
 
     private final List<Arc> inputArcs = new LinkedList<>();

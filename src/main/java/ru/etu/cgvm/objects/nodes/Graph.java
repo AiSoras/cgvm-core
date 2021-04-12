@@ -1,5 +1,6 @@
 package ru.etu.cgvm.objects.nodes;
 
+import lombok.ToString;
 import ru.etu.cgvm.objects.TypeHierarchy;
 import ru.etu.cgvm.objects.SignatureParameter;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import ru.etu.cgvm.utils.GraphObjectUtils;
 import java.util.*;
 
 @Slf4j
+@ToString
 public class Graph extends Concept {
 
     @Setter

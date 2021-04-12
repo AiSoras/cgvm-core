@@ -3,12 +3,14 @@ package ru.etu.cgvm.objects.nodes;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import ru.etu.cgvm.objects.Referent;
 import ru.etu.cgvm.objects.base.Node;
 
 import java.util.*;
 
 @NoArgsConstructor
+@ToString
 public class Concept extends Node {
 
     @Setter

@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ru.etu.cgvm.objects.nodes.Graph;
 
 @EqualsAndHashCode
+@ToString
 public abstract class GraphObject {
 
     public enum Kind {
