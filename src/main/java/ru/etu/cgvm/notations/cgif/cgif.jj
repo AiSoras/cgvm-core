@@ -297,7 +297,7 @@ Lambda lambda(Graph enclosingGraph): {
     SignatureParameter signatureParameter;
     Lambda lambda = new Lambda();
 } {
-    <LPAREN><LAMBDA><LPAREN>(signatureParameter = parameter()
+    <LPAREN><LAMBDA><LPAREN>[signatureParameter = parameter()
     {
         lambda.addSignatureParameter(signatureParameter);
     }
@@ -305,10 +305,9 @@ Lambda lambda(Graph enclosingGraph): {
     {
         lambda.addSignatureParameter(signatureParameter);
     }
-    )*)?<RPAREN> (term(lambda))+<RPAREN>
+    )*]<RPAREN> (term(lambda))+<RPAREN>
     {
-        enclosingGraph.addObject(lambda);
-        return lambda;
+        return lambda; // Не добавляем в граф, так как используется в иерархии
     }
 }
 

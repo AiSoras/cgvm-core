@@ -3,22 +3,29 @@ package ru.etu.cgvm.ui;
 import com.mxgraph.layout.mxCompactTreeLayout;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxStylesheet;
 import javafx.embed.swing.SwingNode;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import ru.etu.cgvm.objects.Arc;
+import ru.etu.cgvm.objects.TypeHierarchy;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.base.GraphObject;
 import ru.etu.cgvm.objects.graphs.Context;
+import ru.etu.cgvm.objects.graphs.Lambda;
 import ru.etu.cgvm.objects.nodes.Actor;
 import ru.etu.cgvm.objects.nodes.Concept;
 import ru.etu.cgvm.objects.nodes.Relation;
 import ru.etu.cgvm.utils.GraphObjectUtils;
+import ru.etu.cgvm.utils.SettingManager;
 
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.function.BiPredicate;
 
 public class GraphPainter {
 
@@ -63,68 +70,128 @@ public class GraphPainter {
     private final Map<String, Object> conceptObjects = new HashMap<>();
     private final Map<String, Object> relationObjects = new HashMap<>();
     private final Map<String, Object> actorObjects = new HashMap<>();
-    private final Map<String, Object> contextObjects = new HashMap<>();
+    private final Map<String, Object> graphObjects = new HashMap<>();
 
     private void addContextObjects(mxGraph graphFrame, Object parent, Graph context) {
+        addConcepts(graphFrame, parent, context);
+        addRelations(graphFrame, parent, context, (graph, arc) -> true);
+        addActors(graphFrame, parent, context);
+    }
+
+    private void addContextObjects(mxGraph graphFrame, Object parent, Graph context, BiPredicate<Graph, Arc> additionalCheck) {
+        addConcepts(graphFrame, parent, context);
+        addRelations(graphFrame, parent, context, additionalCheck);
+        addActors(graphFrame, parent, context);
+    }
+
+    private void addConcepts(mxGraph graphFrame, Object parent, Graph context) {
         Collection<GraphObject> conceptList = GraphObjectUtils.getShallowObjects(context, GraphObject.Kind.CONCEPT);
-        Collection<GraphObject> relationList = GraphObjectUtils.getShallowObjects(context, GraphObject.Kind.RELATION);
+        conceptList.forEach(concept -> conceptObjects.put(concept.getId(), insertVertex(graphFrame, parent, concept.getStringRepresentation(), "concept")));
+    }
+
+    private void addActors(mxGraph graphFrame, Object parent, Graph context) {
         Collection<GraphObject> actorList = GraphObjectUtils.getShallowObjects(context, GraphObject.Kind.ACTOR);
-
-        conceptList.forEach(concept -> conceptObjects.put(concept.getId(), graphFrame.insertVertex(parent, null, concept.getStringRepresentation(), 20, 20, 80, 30, "concept")));
-        relationList.forEach(relation -> relationObjects.put(relation.getId(), graphFrame.insertVertex(parent, null, relation.getStringRepresentation(), 20, 20, 80, 30, "relation")));
-        actorList.forEach(actor -> actorObjects.put(actor.getId(), graphFrame.insertVertex(parent, null, actor.getStringRepresentation(), 20, 20, 80, 30, "actor")));
-
-        relationList.forEach(relationObject -> {
-            Relation relation = (Relation) relationObject;
-            Object relationVertex = relationObjects.get(relation.getId());
-
-            Optional<Concept> desiredConcept = relation.getInput().findConcept(context);
-
-            if (desiredConcept.isPresent()) {
-                graphFrame.insertEdge(parent, null, "", conceptObjects.get(desiredConcept.get().getId()), relationVertex, "arrow");
-            } else {
-                desiredConcept = relation.getInput().findConcept(context.getOutermostGraph());
-                if (desiredConcept.isPresent()) {
-                    Object additionalConcept = graphFrame.insertVertex(parent, null, desiredConcept.get().getStringRepresentation(), 20, 20, 80, 30, "concept");
-                    graphFrame.insertEdge(parent, null, "", additionalConcept, relationVertex, "arrow");
-                    graphFrame.insertEdge(parent, null, "", conceptObjects.get(desiredConcept.get().getId()), additionalConcept, "coreferenceLink");
-                } else {
-                    graphFrame.insertEdge(parent, null, "", contextObjects.get(relation.getInput().getContext().getId()), relationVertex, "arrow");
-                }
-            }
-
-            desiredConcept = relation.getOutput().findConcept(context);
-            if (desiredConcept.isPresent()) {
-                graphFrame.insertEdge(parent, null, "", relationVertex, conceptObjects.get(desiredConcept.get().getId()), "arrow");
-            } else {
-                desiredConcept = relation.getOutput().findConcept(context.getOutermostGraph());
-                if (desiredConcept.isPresent()) {
-                    Object additionalConcept = graphFrame.insertVertex(parent, null, desiredConcept.get().getStringRepresentation(), 20, 20, 80, 30, "concept");
-                    graphFrame.insertEdge(parent, null, "", relationVertex, additionalConcept, "arrow");
-                    graphFrame.insertEdge(parent, null, "", conceptObjects.get(desiredConcept.get().getId()), additionalConcept, "coreferenceLink");
-                } else {
-                    graphFrame.insertEdge(parent, null, "", relationVertex, contextObjects.get(relation.getOutput().getContext().getId()), "arrow");
-                }
-            }
-        });
+        actorList.forEach(actor -> actorObjects.put(actor.getId(), insertVertex(graphFrame, parent, actor.getStringRepresentation(), "actor")));
 
         actorList.forEach(actorObject -> {
             Actor actor = (Actor) actorObject;
             Object actorVertex = actorObjects.get(actor.getId());
 
             Arc arc;
-            java.util.List<Arc> inputArcs = actor.getInputArcs();
+            List<Arc> inputArcs = actor.getInputArcs();
             for (int order = 1; order <= inputArcs.size(); order++) {
                 arc = inputArcs.get(order - 1);
-                graphFrame.insertEdge(parent, null, order, conceptObjects.get(arc.findConcept(context).get().getId()), actorVertex, "arrow");
+                insertArrow(graphFrame, parent, order, conceptObjects.get(arc.findConcept(context).get().getId()), actorVertex);
             }
 
             List<Arc> outputArcs = actor.getOutputArcs();
             for (int order = 1; order <= outputArcs.size(); order++) {
                 arc = outputArcs.get(order - 1);
-                graphFrame.insertEdge(parent, null, order, actorVertex, conceptObjects.get(arc.findConcept(context).get().getId()), "arrow");
+                insertArrow(graphFrame, parent, order, actorVertex, conceptObjects.get(arc.findConcept(context).get().getId()));
             }
         });
+    }
+
+    private void addRelations(mxGraph graphFrame, Object parent, Graph context, BiPredicate<Graph, Arc> additionalCheck) {
+        Collection<GraphObject> relationList = GraphObjectUtils.getShallowObjects(context, GraphObject.Kind.RELATION);
+        relationList.forEach(relation -> relationObjects.put(relation.getId(), insertVertex(graphFrame, parent, relation.getStringRepresentation(), "relation")));
+
+        relationList.forEach(relationObject -> {
+            Relation relation = (Relation) relationObject;
+            Object relationVertex = relationObjects.get(relation.getId());
+            Optional<Concept> desiredConcept;
+
+            if (additionalCheck.test(context, relation.getInput())) {
+                desiredConcept = relation.getInput().findConcept(context);
+                if (desiredConcept.isPresent()) {
+                    insertArrow(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), relationVertex);
+                } else {
+                    desiredConcept = relation.getInput().findConcept(context.getOutermostGraph());
+                    if (desiredConcept.isPresent()) {
+                        Object additionalConcept = insertVertex(graphFrame, parent, desiredConcept.get().getStringRepresentation(), "concept");
+                        insertArrow(graphFrame, parent, additionalConcept, relationVertex);
+                        insertCoreferenceLink(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), additionalConcept);
+                    } else {
+                        insertArrow(graphFrame, parent, graphObjects.get(relation.getInput().getContext().getId()), relationVertex);
+                    }
+                }
+            }
+
+            if (additionalCheck.test(context, relation.getOutput())) {
+                desiredConcept = relation.getOutput().findConcept(context);
+                if (desiredConcept.isPresent()) {
+                    insertArrow(graphFrame, parent, relationVertex, conceptObjects.get(desiredConcept.get().getId()));
+                } else {
+                    desiredConcept = relation.getOutput().findConcept(context.getOutermostGraph());
+                    if (desiredConcept.isPresent()) {
+                        Object additionalConcept = insertVertex(graphFrame, parent, desiredConcept.get().getStringRepresentation(), "concept");
+                        insertArrow(graphFrame, parent, relationVertex, additionalConcept);
+                        insertCoreferenceLink(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), additionalConcept);
+                    } else {
+                        insertArrow(graphFrame, parent, relationVertex, graphObjects.get(relation.getOutput().getContext().getId()));
+                    }
+                }
+            }
+        });
+    }
+
+    private void addTypeHierarchy(mxGraph graphFrame, Object parent, Graph context) {
+        List<Triple<String, TypeHierarchy.Order, String>> typeOrders = context.getTypeHierarchy().getTypeOrders();
+        List<Pair<String, Lambda>> typeDefinitions = context.getTypeHierarchy().getTypeDefinitions();
+
+        typeOrders.forEach(typeOrder -> {
+            Object order = insertVertex(graphFrame, parent, typeOrder.getMiddle().name(), "relation");
+            Object from = insertVertex(graphFrame, parent, typeOrder.getLeft(), "concept");
+            Object to = insertVertex(graphFrame, parent, typeOrder.getRight(), "concept");
+            insertArrow(graphFrame, parent, from, order);
+            insertArrow(graphFrame, parent, order, to);
+        });
+
+        typeDefinitions.forEach(typeDefinition -> {
+            Object type = insertVertex(graphFrame, parent, typeDefinition.getKey(), "concept");
+            Object def = insertVertex(graphFrame, parent, TypeHierarchy.DEF, "relation");
+            Object lambda = insertVertex(graphFrame, parent, typeDefinition.getValue().getStringRepresentation(), "concept");
+            graphObjects.put(typeDefinition.getValue().getId(), lambda);
+            insertArrow(graphFrame, parent, type, def);
+            insertArrow(graphFrame, parent, def, lambda);
+            addContextObjects(graphFrame, lambda, typeDefinition.getValue(), (graph, arc) -> !typeDefinition.getValue().isSignatureParameter(arc.getCoreferenceLink()));
+        });
+    }
+
+    private Object insertVertex(mxGraph graphFrame, Object parent, String label, String styleName) {
+        return graphFrame.insertVertex(parent, null, label, 20, 20, 80, 30, styleName);
+    }
+
+    private Object insertArrow(mxGraph graphFrame, Object parent, Object label, Object from, Object to) {
+        return graphFrame.insertEdge(parent, null, label, from, to, "arrow");
+    }
+
+    private Object insertArrow(mxGraph graphFrame, Object parent, Object from, Object to) {
+        return graphFrame.insertEdge(parent, null, "", from, to, "arrow");
+    }
+
+    private Object insertCoreferenceLink(mxGraph graphFrame, Object parent, Object from, Object to) {
+        return graphFrame.insertEdge(parent, null, "", from, to, "coreferenceLink");
     }
 
     private mxGraph initGraphFrame() {
@@ -141,23 +208,26 @@ public class GraphPainter {
     }
 
     private void addContexts(mxGraph graphFrame, Graph outermostGraph) {
-        contextObjects.put(outermostGraph.getId(), graphFrame.getDefaultParent());
+        graphObjects.put(outermostGraph.getId(), graphFrame.getDefaultParent());
 
         Collection<Context> nestedContext = outermostGraph.getNestedContexts();
         nestedContext.forEach(context ->
-                contextObjects.put(context.getId(),
-                        graphFrame.insertVertex(getParentObject(graphFrame, context), null, context.getStringRepresentation(), 20, 20, 80, 30, "context"))
+                graphObjects.put(context.getId(),
+                        insertVertex(graphFrame, getParentObject(graphFrame, context), context.getStringRepresentation(), "context"))
         );
 
         Collection<Context> contextList = new LinkedList<>(Collections.singletonList((Context) outermostGraph));
         contextList.addAll(nestedContext);
-        contextList.forEach(context -> addContextObjects(graphFrame, contextObjects.get(context.getId()), context));
+        contextList.forEach(context -> {
+            addContextObjects(graphFrame, graphObjects.get(context.getId()), context);
+            addTypeHierarchy(graphFrame, graphObjects.get(context.getId()), context);
+        });
     }
 
     private Object getParentObject(mxGraph graphFrame, Context context) {
         return Optional.ofNullable(
                 context.getOwner() != null
-                        ? contextObjects.get(context.getOwner().getId())
+                        ? graphObjects.get(context.getOwner().getId())
                         : graphFrame.getDefaultParent())
                 .orElseThrow(() -> new IllegalStateException("No object found for context: " + context));
     }
@@ -170,7 +240,7 @@ public class GraphPainter {
         mxGraphComponent graphComponent = new mxGraphComponent(graphFrame);
         configureGraphComponent(graphComponent);
         mxCompactTreeLayout layout = new mxCompactTreeLayout(graphFrame);
-        contextObjects.values().forEach(layout::execute);
+        graphObjects.values().forEach(layout::execute);
         swingNode.setContent(graphComponent);
     }
 
@@ -181,12 +251,19 @@ public class GraphPainter {
         graph.setExtendParents(true);
         graph.setExtendParentsOnAdd(true);
         graph.setDefaultOverlap(0);
+        graph.setAutoOrigin(true);
+        graph.setAutoSizeCells(true);
+        graph.setMinimumGraphSize(new mxRectangle(0, 0,
+                Double.parseDouble(SettingManager.getInstance().getProperty("viewer.area.width")),
+                Double.parseDouble(SettingManager.getInstance().getProperty("viewer.area.height"))
+        ));
     }
 
     private void configureGraphComponent(mxGraphComponent graphComponent) {
         graphComponent.getViewport().setOpaque(true);
         graphComponent.getViewport().setBackground(Color.WHITE);
         graphComponent.setAutoScroll(true);
+        graphComponent.setCenterZoom(true);
         graphComponent.setConnectable(false);
     }
 }

@@ -17,16 +17,12 @@ public abstract class Graph extends GraphObject {
     @Getter
     private final TypeHierarchy typeHierarchy = new TypeHierarchy();
 
-    protected Graph() {
-        super(Kind.GRAPH);
-    }
-
     protected Graph(Kind kind) {
         super(kind);
     }
 
     protected Graph(Graph enclosingGraph) {
-        this();
+        super(Kind.GRAPH);
         if (enclosingGraph != null)
             enclosingGraph.addObject(this);
     }
@@ -51,7 +47,7 @@ public abstract class Graph extends GraphObject {
             return graphObject;
         }
         // search through all contained ru.etu.cgvm.objects...
-        for (GraphObject object : GraphObjectUtils.getShallowObjects(this, Kind.GRAPH)) {
+        for (GraphObject object : GraphObjectUtils.getShallowObjects(this, Kind.CONTEXT)) {
             graphObject = ((Graph) object).findByID(id);
             if (graphObject.isPresent()) {
                 return graphObject;
@@ -69,7 +65,7 @@ public abstract class Graph extends GraphObject {
         if (desiredConcept.isPresent()) {
             return desiredConcept;
         }
-        for (GraphObject object : GraphObjectUtils.getShallowObjects(this, Kind.CONTEXT)) { // TODO: Подумать насчет разделения контекстов и лямбд
+        for (GraphObject object : GraphObjectUtils.getShallowObjects(this, Kind.CONTEXT)) {
             desiredConcept = ((Graph) object).getConceptByCoreferenceLink(coreferenceLink);
             if (desiredConcept.isPresent()) {
                 return desiredConcept;

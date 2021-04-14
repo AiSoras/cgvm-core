@@ -1,7 +1,7 @@
 package ru.etu.cgvm.objects;
 
-import lombok.ToString;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
@@ -14,6 +14,8 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class TypeHierarchy {
+
+    public static final String DEF = "Def";
 
     public enum Order {
         EQ,

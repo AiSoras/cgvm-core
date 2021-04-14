@@ -29,4 +29,8 @@ public class Lambda extends Graph {
                 .map(signatureParameter -> signatureParameter.getType().getName() + " " + signatureParameter.getVariable())
                 .collect(Collectors.joining(", ", "(", ")"));
     }
+
+    public boolean isSignatureParameter(String coreferenceLink) {
+        return signatureParameters.stream().anyMatch(signatureParameter -> signatureParameter.getVariable().equalsIgnoreCase(coreferenceLink));
+    }
 }

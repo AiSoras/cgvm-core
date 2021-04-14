@@ -513,10 +513,10 @@ public class CgifParser implements CgifParserConstants {
                 }
             }
             jj_consume_token(RPAREN);
-            enclosingGraph.addObject(lambda);
             {
                 if ("" != null) return lambda;
-            }
+            } // Не добавляем в граф, так как используется в иерархии
+
             throw new IllegalStateException("Missing return statement in function");
         } finally {
             trace_return("lambda");
@@ -1011,15 +1011,15 @@ public class CgifParser implements CgifParserConstants {
         return jj_scan_token(TILDE);
     }
 
-    private boolean jj_3_4() {
-        return jj_3R_14();
-    }
-
     private boolean jj_3R_15() {
         Token xsp;
         xsp = jj_scanpos;
         if (jj_3R_23()) jj_scanpos = xsp;
         return jj_scan_token(IDENTIFIER);
+    }
+
+    private boolean jj_3_4() {
+        return jj_3R_14();
     }
 
     private boolean jj_3R_23() {
@@ -1108,6 +1108,16 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
+    private boolean jj_3R_12() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_20()) {
+            jj_scanpos = xsp;
+            return jj_3R_21();
+        }
+        return false;
+    }
+
     private boolean jj_3R_41() {
         Token xsp;
         xsp = jj_scanpos;
@@ -1119,16 +1129,6 @@ public class CgifParser implements CgifParserConstants {
                 jj_scanpos = xsp;
                 return jj_scan_token(41);
             }
-        }
-        return false;
-    }
-
-    private boolean jj_3R_12() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_20()) {
-            jj_scanpos = xsp;
-            return jj_3R_21();
         }
         return false;
     }
@@ -1172,19 +1172,6 @@ public class CgifParser implements CgifParserConstants {
         return jj_3R_15();
     }
 
-    private boolean jj_3R_42() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_scan_token(42)) {
-            jj_scanpos = xsp;
-            if (jj_scan_token(49)) {
-                jj_scanpos = xsp;
-                return jj_3R_45();
-            }
-        }
-        return false;
-    }
-
     private boolean jj_3R_21() {
         if (jj_scan_token(LBRACKET)) return true;
         if (jj_scan_token(IDENTIFIER)) return true;
@@ -1202,6 +1189,19 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
+    private boolean jj_3R_42() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_scan_token(42)) {
+            jj_scanpos = xsp;
+            if (jj_scan_token(49)) {
+                jj_scanpos = xsp;
+                return jj_3R_45();
+            }
+        }
+        return false;
+    }
+
     private boolean jj_3R_43() {
         return jj_scan_token(QUANTIFIER);
     }
@@ -1210,14 +1210,14 @@ public class CgifParser implements CgifParserConstants {
         return jj_3R_32();
     }
 
-    private boolean jj_3R_34() {
-        return jj_3R_38();
-    }
-
     private boolean jj_3R_13() {
         if (jj_scan_token(LBRACKET)) return true;
         if (jj_scan_token(TYPEHIERARCHY)) return true;
         return jj_scan_token(COLON);
+    }
+
+    private boolean jj_3R_34() {
+        return jj_3R_38();
     }
 
     private boolean jj_3_8() {
@@ -1236,6 +1236,10 @@ public class CgifParser implements CgifParserConstants {
         return jj_scan_token(LBRACKET);
     }
 
+    private boolean jj_3_9() {
+        return jj_3R_17();
+    }
+
     private boolean jj_3R_14() {
         Token xsp;
         xsp = jj_scanpos;
@@ -1245,10 +1249,6 @@ public class CgifParser implements CgifParserConstants {
 
     private boolean jj_3_7() {
         return jj_3R_12();
-    }
-
-    private boolean jj_3_9() {
-        return jj_3R_17();
     }
 
     private boolean jj_3R_22() {
