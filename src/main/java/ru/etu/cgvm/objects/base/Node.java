@@ -7,7 +7,7 @@ import ru.etu.cgvm.objects.Type;
 
 import java.util.Optional;
 
-@ToString
+@ToString(callSuper = true)
 public abstract class Node extends GraphObject {
 
     @Getter
@@ -20,6 +20,6 @@ public abstract class Node extends GraphObject {
 
     @Override
     public String getStringRepresentation() {
-        return Optional.ofNullable(type).orElse(new Type()).getName();
+        return Optional.ofNullable(type).orElse(new Type()).toString();
     }
 }

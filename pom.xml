@@ -94,6 +94,19 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -119,7 +132,7 @@
                             <goal>javacc</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>src/main/java/ru/etu/cgvm/javacc</sourceDirectory>
+                            <sourceDirectory>src/main/java/ru/etu/cgvm/notations/cgif</sourceDirectory>
                             <outputDirectory>src/main/java</outputDirectory>
                         </configuration>
                     </execution>

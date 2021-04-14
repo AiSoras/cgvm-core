@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
-
-<VBox prefHeight="600.0" prefWidth="900.0"
-      xmlns="http://javafx.com/javafx/16"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ru.etu.cgvm.controllers.ViewerSceneController">
+<VBox prefHeight="650.0" prefWidth="930.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ru.etu.cgvm.ui.controllers.ViewerSceneController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="File">
-            <MenuItem mnemonicParsing="false" text="Open…" onAction="#openFile"/>
-            <MenuItem mnemonicParsing="false" text="Save As…" onAction="#saveAsFile"/>
+            <MenuItem mnemonicParsing="false" onAction="#openFile" text="Open…"/>
+            <MenuItem mnemonicParsing="false" onAction="#saveAsFile" text="Save As…"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
             <MenuItem mnemonicParsing="false" text="Quit"/>
         </Menu>
@@ -30,10 +17,11 @@
             <MenuItem mnemonicParsing="false" text="About Graph Viewer"/>
         </Menu>
     </MenuBar>
-    <SplitPane dividerPositions="0.2505567928730512" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.2834051724137931" VBox.vgrow="ALWAYS">
         <AnchorPane>
-            <Label alignment="CENTER" layoutX="11.0" layoutY="14.0" minWidth="45.0" prefHeight="27.0"
-                   prefWidth="45.0" style="&#10;" text="Input" textAlignment="CENTER">
+            <Label alignment="CENTER" layoutX="11.0" layoutY="14.0" minWidth="45.0" prefHeight="27.0" prefWidth="45.0"
+                   style="&#10;" text="Input" textAlignment="CENTER" AnchorPane.leftAnchor="14.0"
+                   AnchorPane.topAnchor="14.0">
                 <font>
                     <Font size="18.0" fx:id="x1"/>
                 </font>
@@ -41,16 +29,16 @@
                     <Color red="0.624" green="0.624" blue="0.624" fx:id="x2"/>
                 </textFill>
             </Label>
-            <Button layoutX="11.0" layoutY="534.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="200.0"
-                    text="Draw" fx:id="drawButton" onAction="#clickDrawButton"/>
-            <TextArea layoutX="11.0" layoutY="57.0" prefHeight="460.0" prefWidth="200.0" fx:id="input"
-                      focusTraversable="true"/>
+            <Button fx:id="drawButton" layoutX="11.0" layoutY="534.0" mnemonicParsing="false"
+                    onAction="#clickDrawButton" prefHeight="25.0" text="Draw" AnchorPane.bottomAnchor="15.0"
+                    AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"/>
+            <TextArea fx:id="input" focusTraversable="true" layoutX="11.0" layoutY="57.0" AnchorPane.bottomAnchor="55.0"
+                      AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="55.0"/>
         </AnchorPane>
-        <ScrollPane prefHeight="551.0" prefWidth="588.0">
-            <AnchorPane id="Content" prefHeight="568.0" prefWidth="667.0">
-                <Canvas height="573.0" width="670.0"/>
+        <ScrollPane prefHeight="623.0" prefWidth="626.0">
+            <AnchorPane fx:id="canvas">
                 <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="View"
-                       textAlignment="CENTER" textFill="$x2"/>
+                       textAlignment="CENTER" textFill="$x2" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0"/>
             </AnchorPane>
         </ScrollPane>
     </SplitPane>

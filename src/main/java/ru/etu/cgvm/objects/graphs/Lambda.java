@@ -1,13 +1,20 @@
 package ru.etu.cgvm.objects.graphs;
 
 import lombok.Getter;
+import lombok.ToString;
 import ru.etu.cgvm.objects.SignatureParameter;
 import ru.etu.cgvm.objects.base.Graph;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
+@ToString(callSuper = true)
 public class Lambda extends Graph {
+
+    public Lambda() {
+        super(Kind.LAMBDA);
+    }
 
     @Getter
     private final Collection<SignatureParameter> signatureParameters = new LinkedList<>();
@@ -18,6 +25,8 @@ public class Lambda extends Graph {
 
     @Override
     public String getStringRepresentation() {
-        return null;
+        return "lambda " + signatureParameters.stream()
+                .map(signatureParameter -> signatureParameter.getType().getName() + " " + signatureParameter.getVariable())
+                .collect(Collectors.joining(", ", "(", ")"));
     }
 }

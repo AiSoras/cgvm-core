@@ -3,10 +3,8 @@ package ru.etu.cgvm.objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
-@ToString
 @NoArgsConstructor
 public class Type {
 
@@ -19,5 +17,10 @@ public class Type {
 
     public void setNegated(String tilde) {
         isNegated = StringUtils.isNotBlank(tilde);
+    }
+
+    @Override
+    public String toString() {
+        return isNegated ? "~" : "" + name;
     }
 }

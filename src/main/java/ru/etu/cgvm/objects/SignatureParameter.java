@@ -19,7 +19,7 @@ public class SignatureParameter {
 
     public void setVariable(String variable) {
         if (Optional.ofNullable(variable).isPresent()) {
-            this.variable = variable.replace("*", "");
+            this.variable = variable.replace("*", ""); //Всегда определяющие метки
         }
     }
 }

@@ -3,13 +3,17 @@ package ru.etu.cgvm.objects.base;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.util.UUID;
 
 @EqualsAndHashCode
+@ToString
 public abstract class GraphObject {
 
     @Getter
     @Setter
-    protected ObjectID id = new ObjectID();
+    protected String id = UUID.randomUUID().toString();
     @Getter
     protected final Kind kind;
     @Getter
@@ -20,7 +24,9 @@ public abstract class GraphObject {
         ACTOR,
         RELATION,
         CONCEPT,
-        GRAPH
+        GRAPH,
+        CONTEXT,
+        LAMBDA,
     }
 
     protected GraphObject(Kind kind) {

@@ -7,7 +7,7 @@ import ru.etu.cgvm.objects.base.Node;
 import java.util.LinkedList;
 import java.util.List;
 
-@ToString
+@ToString(callSuper = true)
 public class Actor extends Node {
 
     private final List<Arc> inputArcs = new LinkedList<>();

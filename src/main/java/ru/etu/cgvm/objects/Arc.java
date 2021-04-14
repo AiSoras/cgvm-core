@@ -1,11 +1,11 @@
 package ru.etu.cgvm.objects;
 
-import lombok.ToString;
-import ru.etu.cgvm.objects.base.Graph;
-import ru.etu.cgvm.objects.nodes.Concept;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import ru.etu.cgvm.objects.base.Graph;
+import ru.etu.cgvm.objects.nodes.Concept;
 
 import java.util.Optional;
 
@@ -22,7 +22,15 @@ public class Arc {
 
     public void setCoreferenceLink(String coreferenceLink) {
         if (Optional.ofNullable(coreferenceLink).isPresent()) {
-            this.coreferenceLink = coreferenceLink.replaceFirst("^[*?]", "");
+            this.coreferenceLink = coreferenceLink.replace("?", ""); //Всегда связанные метки
+        }
+    }
+
+    public Optional<Concept> findConcept(Graph owner) {
+        if (concept != null) {
+            return Optional.of(concept);
+        } else {
+            return owner.getConceptByCoreferenceLink(coreferenceLink);
         }
     }
 }

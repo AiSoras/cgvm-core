@@ -1,15 +1,18 @@
 package ru.etu.cgvm.objects.graphs;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.etu.cgvm.objects.TypeHierarchy;
+import lombok.ToString;
 import ru.etu.cgvm.objects.base.Graph;
 
 import java.util.Optional;
 
-@NoArgsConstructor
+@ToString
 public class Context extends Graph {
+
+    public Context() {
+        super(Kind.CONTEXT);
+    }
 
     @Setter
     @Getter
@@ -25,6 +28,7 @@ public class Context extends Graph {
 
     @Override
     public String getStringRepresentation() {
-        return Optional.ofNullable(name).orElse("");
+        return isNegated ? "~" : "" +
+                Optional.ofNullable(name).orElse("");
     }
 }

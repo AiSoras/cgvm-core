@@ -1,14 +1,17 @@
-package ru.etu.cgvm.controllers;
+package ru.etu.cgvm.ui.controllers;
 
+import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import lombok.NoArgsConstructor;
 import ru.etu.cgvm.GraphViewer;
-import ru.etu.cgvm.javacc.parser.CgifParser;
-import ru.etu.cgvm.javacc.parser.ParseException;
+import ru.etu.cgvm.notations.cgif.parser.CgifParser;
+import ru.etu.cgvm.notations.cgif.parser.ParseException;
 import ru.etu.cgvm.objects.base.Graph;
+import ru.etu.cgvm.ui.GraphPainter;
 import ru.etu.cgvm.utils.SettingManager;
 
 import java.io.File;
@@ -32,9 +35,15 @@ public class ViewerSceneController {
     private TextArea input;
 
     @FXML
+    private AnchorPane canvas;
+
+    @FXML
     private void clickDrawButton() {
         try {
-            Graph graph = new CgifParser().parse(input.getText());
+            final Graph graph = new CgifParser().parse(input.getText());
+            final SwingNode swingNode = new SwingNode();
+            new GraphPainter().drawGraph(graph, swingNode);
+            canvas.getChildren().add(swingNode);
         } catch (ParseException e) {
             showErrorAlert(e);
         }

@@ -1,0 +1,7 @@
+<rdf:Description>
+<rdf:subject resource="http://www.bookstore.org/id1971"/>
+<rdf:predicate resource="#author"/>
+<rdf:object>John Rawls</rdf:object>
+<rdf:type resource="http://www.w3.org/1999/02/22-rdfsyntax-ns#Statement"/>
+<attributedTo>John K. Galbraith</attributedTo>
+</rdf:Description>

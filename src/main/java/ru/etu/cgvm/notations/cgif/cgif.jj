@@ -5,14 +5,13 @@ options {
 
 PARSER_BEGIN(CgifParser)
 
-package ru.etu.cgvm.javacc.parser;
+package ru.etu.cgvm.notations.cgif.parser;
 
 import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.Referent;
 import ru.etu.cgvm.objects.SignatureParameter;
 import ru.etu.cgvm.objects.Type;
 import ru.etu.cgvm.objects.base.Graph;
-import ru.etu.cgvm.objects.base.Node;
 import ru.etu.cgvm.objects.graphs.Context;
 import ru.etu.cgvm.objects.graphs.Lambda;
 import ru.etu.cgvm.objects.nodes.Actor;
@@ -258,11 +257,14 @@ void relation(Graph enclosingGraph): {
     Type type;
     Arc arc;
 } {
-    <LPAREN> type = type() (arc = arc(enclosingGraph)
+    <LPAREN> type = type() arc = arc(enclosingGraph)
     {
-        relation.addArc(arc);
+        relation.setInput(arc);
+    } arc = arc(enclosingGraph)
+    {
+        relation.setOutput(arc);
     }
-    )+ <RPAREN>
+    <RPAREN>
     {
         relation.setType(type);
         enclosingGraph.addObject(relation);
