@@ -17,7 +17,7 @@ public final class SettingManager {
 
     private static SettingManager instance;
 
-    public static SettingManager getInstance() {
+    private static SettingManager getInstance() {
         if (instance == null) {
             instance = new SettingManager();
         }
@@ -38,15 +38,15 @@ public final class SettingManager {
         }
     }
 
-    public String getProperty(final String key) {
-        return System.getProperty(key, properties.getProperty(key));
+    public static String getProperty(final String key) {
+        return System.getProperty(key, getInstance().properties.getProperty(key));
     }
 
-    public String getProperty(final String key, final String defaultValue) {
-        return System.getProperty(key, this.properties.getProperty(key, defaultValue));
+    public static String getProperty(final String key, final String defaultValue) {
+        return System.getProperty(key, getInstance().properties.getProperty(key, defaultValue));
     }
 
-    public void setProperty(final String key, final String value) {
-        properties.setProperty(key, value);
+    public static void setProperty(final String key, final String value) {
+        getInstance().setProperty(key, value);
     }
 }

@@ -7,7 +7,6 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxStylesheet;
-import javafx.embed.swing.SwingNode;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import ru.etu.cgvm.objects.Arc;
@@ -43,8 +42,8 @@ public class GraphPainter {
             mxConstants.STYLE_FILLCOLOR, mxUtils.getHexColorString(Color.WHITE),
             mxConstants.STYLE_STROKECOLOR, mxUtils.getHexColorString(Color.BLACK),
             mxConstants.STYLE_STROKEWIDTH, 1.5,
-            mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_LEFT,
-            mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_TOP,
+            //mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_LEFT,
+            //mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_TOP,
             mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE,
             mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
 
@@ -121,36 +120,44 @@ public class GraphPainter {
             Object relationVertex = relationObjects.get(relation.getId());
             Optional<Concept> desiredConcept;
 
-            if (additionalCheck.test(context, relation.getInput())) {
-                desiredConcept = relation.getInput().findConcept(context);
+            Arc arc = relation.getInput();
+            if (additionalCheck.test(context, arc)) {
+                desiredConcept = arc.findConcept(context);
                 if (desiredConcept.isPresent()) {
                     insertArrow(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), relationVertex);
                 } else {
-                    desiredConcept = relation.getInput().findConcept(context.getOutermostGraph());
+                    desiredConcept = arc.findConcept(context.getOutermostGraph());
                     if (desiredConcept.isPresent()) {
                         Object additionalConcept = insertVertex(graphFrame, parent, desiredConcept.get().getStringRepresentation(), "concept");
                         insertArrow(graphFrame, parent, additionalConcept, relationVertex);
                         insertCoreferenceLink(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), additionalConcept);
                     } else {
-                        insertArrow(graphFrame, parent, graphObjects.get(relation.getInput().getContext().getId()), relationVertex);
+                        insertArrow(graphFrame, parent, graphObjects.get(arc.getContext().getId()), relationVertex);
                     }
                 }
+            } else {
+                Object additionalConcept = insertVertex(graphFrame, parent, arc.getCoreferenceLink(), "concept");
+                insertArrow(graphFrame, parent, additionalConcept, relationVertex);
             }
 
-            if (additionalCheck.test(context, relation.getOutput())) {
-                desiredConcept = relation.getOutput().findConcept(context);
+            arc = relation.getOutput();
+            if (additionalCheck.test(context, arc)) {
+                desiredConcept = arc.findConcept(context);
                 if (desiredConcept.isPresent()) {
                     insertArrow(graphFrame, parent, relationVertex, conceptObjects.get(desiredConcept.get().getId()));
                 } else {
-                    desiredConcept = relation.getOutput().findConcept(context.getOutermostGraph());
+                    desiredConcept = arc.findConcept(context.getOutermostGraph());
                     if (desiredConcept.isPresent()) {
                         Object additionalConcept = insertVertex(graphFrame, parent, desiredConcept.get().getStringRepresentation(), "concept");
                         insertArrow(graphFrame, parent, relationVertex, additionalConcept);
                         insertCoreferenceLink(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), additionalConcept);
                     } else {
-                        insertArrow(graphFrame, parent, relationVertex, graphObjects.get(relation.getOutput().getContext().getId()));
+                        insertArrow(graphFrame, parent, relationVertex, graphObjects.get(arc.getContext().getId()));
                     }
                 }
+            } else {
+                Object additionalConcept = insertVertex(graphFrame, parent, arc.getCoreferenceLink(), "concept");
+                insertArrow(graphFrame, parent, relationVertex, additionalConcept);
             }
         });
     }
@@ -232,7 +239,7 @@ public class GraphPainter {
                 .orElseThrow(() -> new IllegalStateException("No object found for context: " + context));
     }
 
-    public void drawGraph(Graph conceptualGraph, SwingNode swingNode) {
+    public mxGraphComponent drawGraph(Graph conceptualGraph) {
         mxGraph graphFrame = initGraphFrame();
         graphFrame.getModel().beginUpdate();
         addContexts(graphFrame, conceptualGraph);
@@ -241,7 +248,7 @@ public class GraphPainter {
         configureGraphComponent(graphComponent);
         mxCompactTreeLayout layout = new mxCompactTreeLayout(graphFrame);
         graphObjects.values().forEach(layout::execute);
-        swingNode.setContent(graphComponent);
+        return graphComponent;
     }
 
     private void configureGraph(mxGraph graph) {
@@ -254,16 +261,16 @@ public class GraphPainter {
         graph.setAutoOrigin(true);
         graph.setAutoSizeCells(true);
         graph.setMinimumGraphSize(new mxRectangle(0, 0,
-                Double.parseDouble(SettingManager.getInstance().getProperty("viewer.area.width")),
-                Double.parseDouble(SettingManager.getInstance().getProperty("viewer.area.height"))
+                Double.parseDouble(SettingManager.getProperty("viewer.area.width")),
+                Double.parseDouble(SettingManager.getProperty("viewer.area.height"))
         ));
     }
 
     private void configureGraphComponent(mxGraphComponent graphComponent) {
         graphComponent.getViewport().setOpaque(true);
         graphComponent.getViewport().setBackground(Color.WHITE);
-        graphComponent.setAutoScroll(true);
-        graphComponent.setCenterZoom(true);
+        graphComponent.setAutoScroll(false);
+        graphComponent.setCenterZoom(false);
         graphComponent.setConnectable(false);
     }
 }

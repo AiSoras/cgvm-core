@@ -19,10 +19,11 @@ public class GraphViewer extends javafx.application.Application {
     @Override
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
+        stage.setResizable(false);
 
-        stage.setTitle("Graph Viewer by Lokkina Olesia");
-        URL url = getClass().getResource("/scenes/viewer_scene.fxml");
-        InputStream iconStream = getClass().getResourceAsStream(SettingManager.getInstance().getProperty("icon.path"));
+        stage.setTitle(SettingManager.getProperty("app.title"));
+        URL url = getClass().getResource(SettingManager.getProperty("app.fxml"));
+        InputStream iconStream = getClass().getResourceAsStream(SettingManager.getProperty("app.icon.path"));
         stage.getIcons().add(new Image(iconStream));
         stage.setScene(new Scene(FXMLLoader.load(url)));
         stage.show();
@@ -31,4 +32,12 @@ public class GraphViewer extends javafx.application.Application {
     public static void main(String[] args) {
         Application.launch();
     }
+
+    // TODO: RDF support
+    // TODO: SELECT Special context Priority 1
+    // TODO: Save as XML
+    // TODO: Edit graph
+    // TODO: Fix visualization
+    // TODO: Fix lambda visualization (signature as related marks) => DONE
+    // TODO: wrap TypeHierarchy into context as metadata
 }

@@ -1,22 +1,22 @@
 package ru.etu.cgvm.ui.controllers;
 
+import com.gluonhq.charm.glisten.control.ToggleButtonGroup;
+import com.mxgraph.swing.mxGraphComponent;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.ToggleButton;
 import javafx.stage.FileChooser;
 import lombok.NoArgsConstructor;
 import ru.etu.cgvm.GraphViewer;
 import ru.etu.cgvm.notations.cgif.parser.CgifParser;
-import ru.etu.cgvm.notations.cgif.parser.ParseException;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.ui.GraphPainter;
 import ru.etu.cgvm.utils.SettingManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import static ru.etu.cgvm.utils.FileUtils.readContent;
 import static ru.etu.cgvm.utils.FileUtils.saveContentToFile;
@@ -25,28 +25,65 @@ import static ru.etu.cgvm.utils.FileUtils.saveContentToFile;
 public class ViewerSceneController {
 
     private static final FileChooser fileChooser = new FileChooser();
-    private static final SettingManager settingManager = SettingManager.getInstance();
 
     static {
         configureFileChooser(fileChooser);
     }
 
     @FXML
+    private ToggleButtonGroup notationSelector;
+
+    @FXML
     private TextArea input;
 
     @FXML
-    private AnchorPane canvas;
+    private TextArea queryInput;
 
     @FXML
-    private void clickDrawButton() {
+    private SwingNode canvas;
+
+    @FXML
+    private void closeApp() {
+        GraphViewer.getPrimaryStage().close();
+    }
+
+    @FXML
+    private void drawGraph() {
+        Graph graph = null;
         try {
-            final Graph graph = new CgifParser().parse(input.getText());
-            final SwingNode swingNode = new SwingNode();
-            new GraphPainter().drawGraph(graph, swingNode);
-            canvas.getChildren().add(swingNode);
-        } catch (ParseException e) {
+            switch (getSelectedNotation()) {
+                case CGIF -> graph = new CgifParser().parse(input.getText());
+                default -> /* RDF =RdfReader*/ showErrorAlert(new IllegalArgumentException("Only CGIF is supported!"));
+            }
+        } catch (Exception e) {
             showErrorAlert(e);
         }
+
+        if (graph != null) {
+            mxGraphComponent graphComponent = new GraphPainter().drawGraph(graph);
+            canvas.setContent(graphComponent);
+            graphComponent.refresh();
+        }
+    }
+
+    @FXML
+    private void clearGraph() {
+        ((mxGraphComponent) canvas.getContent()).clearCellOverlays();
+    }
+
+    @FXML
+    private void executeQuery() {
+        String query = queryInput.getText();
+    }
+
+    @FXML
+    private void zoomIn() {
+        ((mxGraphComponent) canvas.getContent()).zoomIn();
+    }
+
+    @FXML
+    private void zoomOut() {
+        ((mxGraphComponent) canvas.getContent()).zoomOut();
     }
 
     @FXML
@@ -56,7 +93,7 @@ public class ViewerSceneController {
             try {
                 String content = readContent(file);
                 input.setText(content);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 showErrorAlert(e);
             }
         }
@@ -73,6 +110,18 @@ public class ViewerSceneController {
                 showErrorAlert(e);
             }
         }
+    }
+
+    @FXML
+    private void showAbout() {
+        String message = String.format("%s%nVersion: %s",
+                SettingManager.getProperty("app.name"),
+                SettingManager.getProperty("app.version"));
+        showInfoAlert(message);
+    }
+
+    private Notation getSelectedNotation() {
+        return Notation.valueOf(notationSelector.getToggles().filtered(ToggleButton::isSelected).get(0).getText());
     }
 
     private void showErrorAlert(Exception exception) {
@@ -92,12 +141,9 @@ public class ViewerSceneController {
 
     private static void configureFileChooser(final FileChooser fileChooser) {
         fileChooser.setInitialDirectory(
-                new File(settingManager.getProperty("file.default_folder"))
+                new File(SettingManager.getProperty("file.default_folder"))
         );
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter(
-                        settingManager.getProperty("file.type"),
-                        settingManager.getProperty("file.extension")));
-
+        fileChooser.getExtensionFilters().add(Notation.CGIF.getFileFilter());
+        fileChooser.getExtensionFilters().add(Notation.RDF.getFileFilter());
     }
 }

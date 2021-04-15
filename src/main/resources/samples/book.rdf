@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<rdf:RDF
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:ns="http://www.inria.fr/acacia/iccs#"
+        xml:base="http://burningbird.net/articles/">
+    <rdf:Paper rdf:about="http://www.inria.fr/acacia/iccs2000">
+        <ns:authors>
+            <rdf:Bag ID="auth">
+                <rdf:li>C´edric H´ebert</rdf:li>
+                <rdf:li>Olivier Corby</rdf:li>
+                <rdf:li>Rose Dieng</rdf:li>
+            </rdf:Bag>
+        </ns:authors>
+    </rdf:Paper>
+    <rdf:Description aboutEach="#auth">
+        <ns:inst>INRIA</ns:inst>
+    </rdf:Description>
+</rdf:RDF>

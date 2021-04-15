@@ -5,25 +5,30 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.etu.cgvm.objects.base.Graph;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @ToString
+@Getter
 public class Context extends Graph {
+
+    private boolean isSpecialContext;
+    private String name; // if null => outermost graph
+
+    @Setter
+    private boolean isNegated;
+
+    public Context(Graph enclosingGraph) {
+        super(enclosingGraph);
+    }
 
     public Context() {
         super(Kind.CONTEXT);
     }
 
-    @Setter
-    @Getter
-    private boolean isNegated;
-
-    @Setter
-    @Getter
-    private String name; // if null => outermost graph
-
-    public Context(Graph enclosingGraph) {
-        super(enclosingGraph);
+    public void setName(String name) {
+        this.name = name;
+        this.isSpecialContext = Arrays.stream(SpecialContext.values()).anyMatch(value -> value.name().equalsIgnoreCase(name));
     }
 
     @Override
