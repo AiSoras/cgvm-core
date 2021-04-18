@@ -5,7 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<VBox maxHeight="670.0" prefHeight="670.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/16"
+<VBox maxHeight="670.0" prefHeight="670.0" prefWidth="1178.0" xmlns="http://javafx.com/javafx/16"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.etu.cgvm.ui.controllers.ViewerSceneController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="Файл">
@@ -19,7 +19,7 @@
         </Menu>
     </MenuBar>
     <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="645.0">
-        <SplitPane dividerPositions="0.3456121343445287" maxHeight="645.0" prefHeight="673.0" prefWidth="931.0">
+        <SplitPane dividerPositions="0.31771720613287907" maxHeight="645.0" prefHeight="673.0" prefWidth="931.0">
             <AnchorPane maxHeight="645.0" prefHeight="612.0" prefWidth="318.0">
                 <ToggleButtonGroup fx:id="notationSelector" layoutX="197.0" layoutY="33.0" selectionType="SINGLE"
                                    AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
@@ -74,16 +74,18 @@
                     </Tab>
                 </TabPane>
             </AnchorPane>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-                <ToolBar prefHeight="40.0" prefWidth="200.0">
-                    <Button minWidth="25.0" mnemonicParsing="false" onAction="#zoomIn" text="+"/>
-                    <Button minWidth="25.0" mnemonicParsing="false" onAction="#zoomOut" text="-"/>
-                    <Button mnemonicParsing="false" onAction="#clearGraph" text="Очистить"/>
-                </ToolBar>
-                <ScrollPane prefHeight="609.0" prefWidth="616.0">
-                    <SwingNode fx:id="canvas"/>
-                </ScrollPane>
-            </VBox>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                <children>
+                    <ToolBar prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0"
+                             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Button minWidth="25.0" mnemonicParsing="false" onAction="#zoomIn" text="+"/>
+                        <Button minWidth="25.0" mnemonicParsing="false" onAction="#zoomOut" text="-"/>
+                        <Button mnemonicParsing="false" onAction="#clearGraph" text="Очистить"/>
+                    </ToolBar>
+                    <SwingNode fx:id="canvas" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0"/>
+                </children>
+            </AnchorPane>
         </SplitPane>
     </ScrollPane>
 </VBox>

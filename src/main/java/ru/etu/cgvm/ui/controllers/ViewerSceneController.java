@@ -2,6 +2,7 @@ package ru.etu.cgvm.ui.controllers;
 
 import com.gluonhq.charm.glisten.control.ToggleButtonGroup;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.view.mxGraph;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -62,13 +63,15 @@ public class ViewerSceneController {
         if (graph != null) {
             mxGraphComponent graphComponent = new GraphPainter().drawGraph(graph);
             canvas.setContent(graphComponent);
-            graphComponent.refresh();
         }
     }
 
     @FXML
     private void clearGraph() {
-        ((mxGraphComponent) canvas.getContent()).clearCellOverlays();
+        mxGraph graph = ((mxGraphComponent) canvas.getContent()).getGraph();
+        graph.getModel().beginUpdate();
+        graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
+        graph.getModel().endUpdate();
     }
 
     @FXML

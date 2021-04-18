@@ -37,7 +37,7 @@ public class GraphViewer extends javafx.application.Application {
     // TODO: SELECT Special context Priority 1
     // TODO: Save as XML
     // TODO: Edit graph
-    // TODO: Fix visualization
+    // TODO: Fix visualization => DONE
     // TODO: Fix lambda visualization (signature as related marks) => DONE
-    // TODO: wrap TypeHierarchy into context as metadata
+    // TODO: wrap TypeHierarchy into context as metadata => DONE
 }
