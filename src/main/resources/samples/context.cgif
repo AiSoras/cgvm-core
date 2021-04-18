@@ -1,0 +1,5 @@
+[Person *x1: Ivanov] [Think *x2] (Agnt ?x2 ?x1)
+    (Thme ?x2 [Proposition
+    [Person *x3: Petrov] [Want *x4] (Agnt ?x4 ?x3)
+    (Thme ?x4 [Situation
+    (Agnt [Learn *x5] ?x3) (Thme ?x5 [University])])])

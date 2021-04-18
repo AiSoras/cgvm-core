@@ -10,16 +10,17 @@ public class Type {
 
     @Setter
     @Getter
-    private String name;
+    private String name = "";
     @Setter
     @Getter
     private boolean isNegated;
 
-    public Type(String name) {
-        this.name = name;
-    }
-
     public void setNegated(String tilde) {
         isNegated = StringUtils.isNotBlank(tilde);
+    }
+
+    @Override
+    public String toString() {
+        return isNegated ? "~" : "" + name;
     }
 }

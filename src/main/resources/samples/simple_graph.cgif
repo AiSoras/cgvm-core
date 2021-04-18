@@ -1,0 +1,4 @@
+[Go *x]
+    (Agnt ?x [Person: Ivanov])
+    (Dest ?x [Work])
+    (Inst ?x [Metro])

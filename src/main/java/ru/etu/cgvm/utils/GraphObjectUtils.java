@@ -2,8 +2,8 @@ package ru.etu.cgvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.base.GraphObject;
-import ru.etu.cgvm.objects.nodes.Graph;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

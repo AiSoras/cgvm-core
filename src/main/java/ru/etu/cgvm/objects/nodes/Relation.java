@@ -1,22 +1,20 @@
 package ru.etu.cgvm.objects.nodes;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.base.Node;
-import lombok.NoArgsConstructor;
 
-import java.util.LinkedList;
-import java.util.List;
-
-@NoArgsConstructor
+@ToString
+@Setter
+@Getter
 public class Relation extends Node {
 
-    private final List<Arc> arcs = new LinkedList<>();
+    private Arc input;
+    private Arc output;
 
-    public void addArc(Arc arc) {
-        arcs.add(arc);
-    }
-
-    public List<Arc> getArcs() {
-        return new LinkedList<>(arcs);
+    public Relation() {
+        super(Kind.RELATION);
     }
 }

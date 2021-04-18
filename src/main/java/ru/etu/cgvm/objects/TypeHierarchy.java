@@ -1,17 +1,21 @@
 package ru.etu.cgvm.objects;
 
-import ru.etu.cgvm.objects.nodes.Graph;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import ru.etu.cgvm.objects.graphs.Lambda;
 
 import java.util.LinkedList;
 import java.util.List;
 
+@ToString
 @NoArgsConstructor
 public class TypeHierarchy {
+
+    public static final String DEF = "Def";
 
     public enum Order {
         EQ,
@@ -20,13 +24,13 @@ public class TypeHierarchy {
     }
 
     private final List<Triple<String, Order, String>> typeOrders = new LinkedList<>();
-    private final List<Pair<String, Graph>> typeDefinitions = new LinkedList<>();
+    private final List<Pair<String, Lambda>> typeDefinitions = new LinkedList<>();
 
     public void addTypeOrder(String firstType, String secondType, String order) {
         typeOrders.add(new ImmutableTriple<>(firstType, Order.valueOf(order), secondType));
     }
 
-    public void addTypeDefinition(String firstType, Graph typeDefinition) {
+    public void addTypeDefinition(String firstType, Lambda typeDefinition) {
         typeDefinitions.add(new ImmutablePair<>(firstType, typeDefinition));
     }
 
@@ -34,7 +38,7 @@ public class TypeHierarchy {
         return new LinkedList<>(typeOrders);
     }
 
-    public List<Pair<String, Graph>> getTypeDefinitions() {
+    public List<Pair<String, Lambda>> getTypeDefinitions() {
         return new LinkedList<>(typeDefinitions);
     }
 }

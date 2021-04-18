@@ -1,0 +1,8 @@
+[RelationHierarchy:
+    (Def
+    [RelationLabel: GoingTo]
+    [LambdaExpression: (lambda (Person*x, City*y) [Go *z] (Agnt ?z ?x) (Dest ?z ?y))])]
+[RelationHierarchy:
+    (LT
+    [RelationLabel: GoingTo]
+    [RelationLabel: Dest])]

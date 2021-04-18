@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.gluonhq.charm.glisten.control.ToggleButtonGroup?>
+<?import javafx.embed.swing.SwingNode?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<VBox maxHeight="670.0" prefHeight="670.0" prefWidth="1178.0" xmlns="http://javafx.com/javafx/16"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.etu.cgvm.ui.controllers.ViewerSceneController">
+    <MenuBar VBox.vgrow="NEVER">
+        <Menu mnemonicParsing="false" text="Файл">
+            <MenuItem mnemonicParsing="false" onAction="#openFile" text="Открыть CGIF/RDF…"/>
+            <MenuItem mnemonicParsing="false" onAction="#saveAsFile" text="Сохранить как…"/>
+            <SeparatorMenuItem mnemonicParsing="false"/>
+            <MenuItem mnemonicParsing="false" onAction="#closeApp" text="Закрыть"/>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Справка">
+            <MenuItem mnemonicParsing="false" onAction="#showAbout" text="О программе"/>
+        </Menu>
+    </MenuBar>
+    <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="645.0">
+        <SplitPane dividerPositions="0.31771720613287907" maxHeight="645.0" prefHeight="673.0" prefWidth="931.0">
+            <AnchorPane maxHeight="645.0" prefHeight="612.0" prefWidth="318.0">
+                <ToggleButtonGroup fx:id="notationSelector" layoutX="197.0" layoutY="33.0" selectionType="SINGLE"
+                                   AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+                    <ToggleButton selected="true" text="CGIF" textAlignment="CENTER"/>
+                    <ToggleButton text="RDF" textAlignment="CENTER"/>
+                </ToggleButtonGroup>
+                <Label layoutX="29.0" layoutY="33.0" text="Входной формат" AnchorPane.leftAnchor="30.0"
+                       AnchorPane.topAnchor="33.0">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Label>
+                <Button layoutX="30.0" layoutY="250.0" mnemonicParsing="false" onAction="#drawGraph" text="Отобразить"
+                        AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="265.0">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Button>
+                <TextArea fx:id="input" layoutX="30.0" layoutY="55.0" prefHeight="150.0" prefWidth="200.0"
+                          AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="85.0"/>
+                <TabPane layoutY="328.0" prefHeight="294.0" prefWidth="324.0" tabClosingPolicy="UNAVAILABLE"
+                         AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                         AnchorPane.topAnchor="325.0">
+                    <Tab text="Запрос">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <Button mnemonicParsing="false" onAction="#executeQuery" text="Выполнить"
+                                    AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0"
+                                    AnchorPane.rightAnchor="30.0">
+                                <font>
+                                    <Font size="14.0"/>
+                                </font>
+                            </Button>
+                            <TextArea fx:id="queryInput" prefHeight="150.0" prefWidth="200.0"
+                                      AnchorPane.bottomAnchor="90.0" AnchorPane.leftAnchor="30.0"
+                                      AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+                                <font>
+                                    <Font size="14.0"/>
+                                </font>
+                            </TextArea>
+                        </AnchorPane>
+                    </Tab>
+                    <Tab text="Результат выполнения">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                            <TextArea editable="false" layoutX="14.0" layoutY="14.0" prefHeight="200.0"
+                                      prefWidth="200.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0"
+                                      AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+                                <font>
+                                    <Font size="14.0"/>
+                                </font>
+                            </TextArea>
+                        </AnchorPane>
+                    </Tab>
+                </TabPane>
+            </AnchorPane>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                <children>
+                    <ToolBar prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0"
+                             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Button minWidth="25.0" mnemonicParsing="false" onAction="#zoomIn" text="+"/>
+                        <Button minWidth="25.0" mnemonicParsing="false" onAction="#zoomOut" text="-"/>
+                        <Button mnemonicParsing="false" onAction="#clearGraph" text="Очистить"/>
+                    </ToolBar>
+                    <SwingNode fx:id="canvas" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0"/>
+                </children>
+            </AnchorPane>
+        </SplitPane>
+    </ScrollPane>
+</VBox>

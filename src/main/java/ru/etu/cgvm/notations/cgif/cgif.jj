@@ -5,16 +5,17 @@ options {
 
 PARSER_BEGIN(CgifParser)
 
-package ru.etu.cgvm.javacc.parser;
+package ru.etu.cgvm.notations.cgif.parser;
 
 import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.Referent;
 import ru.etu.cgvm.objects.SignatureParameter;
 import ru.etu.cgvm.objects.Type;
-import ru.etu.cgvm.objects.base.Node;
+import ru.etu.cgvm.objects.base.Graph;
+import ru.etu.cgvm.objects.graphs.Context;
+import ru.etu.cgvm.objects.graphs.Lambda;
 import ru.etu.cgvm.objects.nodes.Actor;
 import ru.etu.cgvm.objects.nodes.Concept;
-import ru.etu.cgvm.objects.nodes.Graph;
 import ru.etu.cgvm.objects.nodes.Relation;
 
 import java.io.ByteArrayInputStream;
@@ -24,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 
 public class CgifParser {
 
-     private Graph topGraph;
+     private Context topContext;
 
      public CgifParser() {
          this((Reader) null);
@@ -33,9 +34,9 @@ public class CgifParser {
      public Graph parse(String content) throws ParseException {
             InputStream is = new ByteArrayInputStream(content.getBytes());
             ReInit(is, StandardCharsets.UTF_8.name());
-            topGraph = new Graph();
+            topContext = new Context();
             initTopLevelGraph();
-            return topGraph;
+            return topContext;
      }
 }
 PARSER_END(CgifParser)
@@ -132,11 +133,11 @@ void initTopLevelGraph(): {} {
 }
 
 void graph(Graph enclosingGraph): {
-    Graph graph;
+    Context graph;
     if (enclosingGraph == null) {
-        graph = topGraph;
+        graph = topContext;
     } else {
-        graph = new Graph(enclosingGraph);
+        graph = new Context(enclosingGraph);
     }
 } {
     (term(graph))+
@@ -212,7 +213,7 @@ Concept concept(Graph enclosingGraph): {
     Referent referent = null;
     Token coreferenceLink;
 } {
-   <LBRACKET> [LOOKAHEAD(2) type = type(concept)]
+   <LBRACKET> [LOOKAHEAD(2) type = type()]
    [(coreferenceLink = <RELATED_MARK>
    {
         concept.addCoreferenceLink(coreferenceLink.image);
@@ -256,11 +257,14 @@ void relation(Graph enclosingGraph): {
     Type type;
     Arc arc;
 } {
-    <LPAREN> type = type(relation) (arc = arc(enclosingGraph)
+    <LPAREN> type = type() arc = arc(enclosingGraph)
     {
-        relation.addArc(arc);
+        relation.setInput(arc);
+    } arc = arc(enclosingGraph)
+    {
+        relation.setOutput(arc);
     }
-    )+ <RPAREN>
+    <RPAREN>
     {
         relation.setType(type);
         enclosingGraph.addObject(relation);
@@ -272,7 +276,7 @@ void actor(Graph g): {
     Type type;
     Arc arc;
 } {
-    <LESSTHAN> type = type(g) (arc = arc(g)
+    <LESSTHAN> type = type() (arc = arc(g)
     {
         actor.addInputArc(arc);
     }
@@ -289,31 +293,30 @@ void actor(Graph g): {
     }
 }
 
-Graph lambda(Graph enclosingGraph): {
+Lambda lambda(Graph enclosingGraph): {
     SignatureParameter signatureParameter;
-    Graph lambda = new Graph();
+    Lambda lambda = new Lambda();
 } {
-    <LPAREN><LAMBDA><LPAREN>(signatureParameter = parameter(lambda)
+    <LPAREN><LAMBDA><LPAREN>[signatureParameter = parameter()
     {
         lambda.addSignatureParameter(signatureParameter);
     }
-    (<COMMA> signatureParameter = parameter(lambda)
+    (<COMMA> signatureParameter = parameter()
     {
         lambda.addSignatureParameter(signatureParameter);
     }
-    )*)?<RPAREN> (term(lambda))+<RPAREN>
+    )*]<RPAREN> (term(lambda))+<RPAREN>
     {
-        enclosingGraph.addObject(lambda);
-        return lambda;
+        return lambda; // Не добавляем в граф, так как используется в иерархии
     }
 }
 
-SignatureParameter parameter(Graph g): {
+SignatureParameter parameter(): {
     SignatureParameter signatureParameter = new SignatureParameter();
     Type type;
     Token variable;
 } {
-    type = type(g) [variable = <DEFINING_MARK>
+    type = type() [variable = <DEFINING_MARK>
     {
         signatureParameter.setVariable(variable.image);
     }]
@@ -323,7 +326,7 @@ SignatureParameter parameter(Graph g): {
     }
 }
 
-Type type(Node g): {
+Type type(): {
     Type type = new Type();
     Token name;
     Token negation;
@@ -340,7 +343,7 @@ Type type(Node g): {
 }
 
 Graph context(Graph enclosingGraph): {
-    Graph context = new Graph();
+    Context context = new Context();
     Token contextName;
 } {
    ( <TILDE>
@@ -350,7 +353,7 @@ Graph context(Graph enclosingGraph): {
    <LBRACKET> (term(context))+<RBRACKET>
   |  <LBRACKET> contextName = <IDENTIFIER>
     {
-        context.setContext(contextName.image);
+        context.setName(contextName.image);
     } (<COLON>)? (term(context))+ <RBRACKET>)
     {
         enclosingGraph.addObject(context);
@@ -371,7 +374,7 @@ void relationTypeHierarchy(Graph g): {} {
 }
 
 void conceptTypeDefinition(Graph g): {
-    Graph definition;
+    Lambda definition;
     String typeName;
 } {
     <LPAREN> <DEF>
@@ -384,7 +387,7 @@ void conceptTypeDefinition(Graph g): {
 }
 
 void relationTypeDefinition(Graph g): {
-    Graph definition;
+    Lambda definition;
     String typeName;
 } {
     <LPAREN> <DEF>
@@ -414,8 +417,8 @@ String relationTypeLabel(): {
     }
 }
 
-Graph lambdaExpression(Graph g): {
-    Graph definition;
+Lambda lambdaExpression(Graph g): {
+    Lambda definition;
 } {
     <LBRACKET> <LAMBDAEXPRESSION> <COLON> (definition = lambda(g)) <RBRACKET>
     {

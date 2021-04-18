@@ -29,12 +29,12 @@ public class Referent {
 
         @Override
         public String toString() {
-            return "Designation{" +
-                    "additionalInfo='" + additionalInfo + '\'' +
-                    ", literal='" + literal + '\'' +
-                    ", locator='" + locator + '\'' +
-                    ", quantifier='" + quantifier + '\'' +
-                    '}';
+            return
+                    (additionalInfo == null ? "" : (additionalInfo + " "))
+                            + (literal == null ? "" : (literal))
+                            + (locator == null ? "" : (locator))
+                            + (quantifier == null ? "" : (quantifier));
+
         }
     }
 
@@ -52,10 +52,19 @@ public class Referent {
 
         @Override
         public String toString() {
-            return "Descriptor{" +
-                    "additionalInfo='" + additionalInfo + '\'' +
-                    ", structure='" + structure + '\'' +
-                    '}';
+            return (additionalInfo == null ? "" : (additionalInfo + " "))
+                    + (structure == null ? "" : structure);
         }
     }
+
+    @Override
+    public String toString() {
+        if (isNegated) {
+            return "~";
+        } else {
+            return (descriptor == null ? "" : (descriptor + " "))
+                    + (designation == null ? "" : designation);
+        }
+    }
+
 }

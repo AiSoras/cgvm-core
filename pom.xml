@@ -25,6 +25,10 @@
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
+        <repository>
+            <id>gluonhq</id>
+            <url>http://nexus.gluonhq.com/nexus/content/repositories/releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -37,14 +41,27 @@
 
         <dependency>
             <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-core</artifactId>
+            <artifactId>jgrapht-ext</artifactId>
             <version>${jgrapht.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-ext</artifactId>
+            <artifactId>jgrapht-core</artifactId>
             <version>${jgrapht.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>apache-jena-libs</artifactId>
+            <type>pom</type>
+            <version>${jena.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-text</artifactId>
+            <version>${jena.version}</version>
         </dependency>
 
         <dependency>
@@ -88,6 +105,30 @@
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-glisten</artifactId>
+            <version>6.0.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -113,7 +154,7 @@
                             <goal>javacc</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>src/main/java/ru/etu/cgvm/javacc</sourceDirectory>
+                            <sourceDirectory>src/main/java/ru/etu/cgvm/notations/cgif</sourceDirectory>
                             <outputDirectory>src/main/java</outputDirectory>
                         </configuration>
                     </execution>
