@@ -4,13 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.etu.cgvm.objects.Referent;
+import ru.etu.cgvm.objects.base.GraphObject;
 import ru.etu.cgvm.objects.base.Node;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
 
-@ToString
+import static ru.etu.cgvm.objects.Constant.EMPTY;
+
+@ToString(callSuper = true)
 public class Concept extends Node {
 
     @Setter
@@ -20,7 +24,6 @@ public class Concept extends Node {
     private final Collection<String> coreferenceLinks = new LinkedList<>();
 
     public Concept() {
-        super(Kind.CONCEPT);
     }
 
     public void addCoreferenceLink(String coreferenceLink) {
@@ -29,8 +32,24 @@ public class Concept extends Node {
         }
     }
 
+    public boolean isAny() {
+        return Optional.ofNullable(referent).orElse(new Referent()).isAny();
+    }
+
     @Override
     public String getStringRepresentation() {
-        return super.getStringRepresentation() + (referent == null ? "" : (": " + referent));
+        return super.getStringRepresentation() + (referent == null ? EMPTY : (": " + referent));
+    }
+
+    @Override
+    public boolean isIdentical(GraphObject other) {
+        if (other == null) return false;
+        if (other instanceof Concept) {
+            Concept otherConcept = (Concept) other;
+            return Objects.equals(type, otherConcept.getType()) // Проверяем тип концептов
+                    && ((isAny() || otherConcept.isAny()) // Если {*}/<*>, то не смотрим на референт
+                    || Objects.equals(referent, otherConcept.getReferent()));
+        }
+        return false;
     }
 }

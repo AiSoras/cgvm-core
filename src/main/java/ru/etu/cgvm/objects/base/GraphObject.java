@@ -8,6 +8,7 @@ import lombok.ToString;
 import java.util.UUID;
 
 @EqualsAndHashCode
+// Не переопределяется в наследниках, так как в нашем случае основное суждение об эквивалетности = по ID
 @ToString
 public abstract class GraphObject {
 
@@ -15,23 +16,10 @@ public abstract class GraphObject {
     @Setter
     protected String id = UUID.randomUUID().toString();
     @Getter
-    protected final Kind kind;
-    @Getter
     @Setter
     protected Graph owner;
 
-    public enum Kind {
-        ACTOR,
-        RELATION,
-        CONCEPT,
-        GRAPH,
-        CONTEXT,
-        LAMBDA,
-    }
-
-    protected GraphObject(Kind kind) {
-        this.kind = kind;
-    }
-
     public abstract String getStringRepresentation();
+
+    public abstract boolean isIdentical(GraphObject other);
 }

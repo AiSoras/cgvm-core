@@ -31,7 +31,7 @@ public class CgifParser {
          this((Reader) null);
      }
 
-     public Graph parse(String content) throws ParseException {
+     public Context parse(String content) throws ParseException {
             InputStream is = new ByteArrayInputStream(content.getBytes());
             ReInit(is, StandardCharsets.UTF_8.name());
             topContext = new Context();
@@ -233,7 +233,7 @@ Concept concept(Graph enclosingGraph): {
 
 Arc arc(Graph g): {
     Arc arc = new Arc();
-    Graph context; // concept or context
+    Context context; // concept or context
     Concept concept;
     Token coreferenceLink;
 } {
@@ -342,7 +342,7 @@ Type type(): {
     }
 }
 
-Graph context(Graph enclosingGraph): {
+Context context(Graph enclosingGraph): {
     Context context = new Context();
     Token contextName;
 } {

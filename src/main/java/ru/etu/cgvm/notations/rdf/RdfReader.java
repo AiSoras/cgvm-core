@@ -1,4 +1,4 @@
-package ru.etu.cgvm.notations.rdfs;
+package ru.etu.cgvm.notations.rdf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.irix.IRIException;

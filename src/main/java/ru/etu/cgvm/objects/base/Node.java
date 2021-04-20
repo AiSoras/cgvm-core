@@ -14,10 +14,6 @@ public abstract class Node extends GraphObject {
     @Setter
     protected Type type;
 
-    protected Node(Kind kind) {
-        super(kind);
-    }
-
     @Override
     public String getStringRepresentation() {
         return Optional.ofNullable(type).orElse(new Type()).toString();

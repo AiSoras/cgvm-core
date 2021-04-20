@@ -11,7 +11,6 @@ import org.apache.commons.lang3.tuple.Triple;
 import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.TypeHierarchy;
 import ru.etu.cgvm.objects.base.Graph;
-import ru.etu.cgvm.objects.base.GraphObject;
 import ru.etu.cgvm.objects.graphs.Context;
 import ru.etu.cgvm.objects.graphs.Lambda;
 import ru.etu.cgvm.objects.nodes.Actor;
@@ -82,16 +81,15 @@ public class GraphPainter {
     }
 
     private void addConcepts(mxGraph graphFrame, Object parent, Graph context) {
-        Collection<GraphObject> conceptList = GraphObjectUtils.getShallowObjects(context, GraphObject.Kind.CONCEPT);
+        Collection<Concept> conceptList = GraphObjectUtils.getNonNestedObjects(context, Concept.class);
         conceptList.forEach(concept -> conceptObjects.put(concept.getId(), insertVertex(graphFrame, parent, concept.getStringRepresentation(), Style.CONCEPT.name())));
     }
 
     private void addActors(mxGraph graphFrame, Object parent, Graph context) {
-        Collection<GraphObject> actorList = GraphObjectUtils.getShallowObjects(context, GraphObject.Kind.ACTOR);
+        Collection<Actor> actorList = GraphObjectUtils.getNonNestedObjects(context, Actor.class);
         actorList.forEach(actor -> actorObjects.put(actor.getId(), insertVertex(graphFrame, parent, actor.getStringRepresentation(), Style.ACTOR.name())));
 
-        actorList.forEach(actorObject -> {
-            Actor actor = (Actor) actorObject;
+        actorList.forEach(actor -> {
             Object actorVertex = actorObjects.get(actor.getId());
 
             Arc arc;
@@ -110,11 +108,10 @@ public class GraphPainter {
     }
 
     private void addRelations(mxGraph graphFrame, Object parent, Graph context, BiPredicate<Graph, Arc> additionalCheck) {
-        Collection<GraphObject> relationList = GraphObjectUtils.getShallowObjects(context, GraphObject.Kind.RELATION);
+        Collection<Relation> relationList = GraphObjectUtils.getNonNestedObjects(context, Relation.class);
         relationList.forEach(relation -> relationObjects.put(relation.getId(), insertVertex(graphFrame, parent, relation.getStringRepresentation(), Style.RELATION.name())));
 
-        relationList.forEach(relationObject -> {
-            Relation relation = (Relation) relationObject;
+        relationList.forEach(relation -> {
             Object relationVertex = relationObjects.get(relation.getId());
             Optional<Concept> desiredConcept;
 
@@ -122,16 +119,16 @@ public class GraphPainter {
             if (additionalCheck.test(context, arc)) {
                 desiredConcept = arc.findConcept(context);
                 if (desiredConcept.isPresent()) {
-                    insertArrow(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), relationVertex);
-                } else {
-                    desiredConcept = arc.findConcept(context.getOutermostGraph());
-                    if (desiredConcept.isPresent()) {
+                    if (Objects.equals(desiredConcept.get().getOwner(), relation.getOwner())) { // То есть лежат в одном контексте
+                        insertArrow(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), relationVertex);
+                    } else {
                         Object additionalConcept = insertVertex(graphFrame, parent, desiredConcept.get().getStringRepresentation(), Style.CONCEPT.name());
                         insertArrow(graphFrame, parent, additionalConcept, relationVertex);
                         insertCoreferenceLink(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), additionalConcept);
-                    } else {
-                        insertArrow(graphFrame, parent, graphObjects.get(arc.getContext().getId()), relationVertex);
                     }
+                } else {
+                    insertArrow(graphFrame, parent, graphObjects.get(arc.getContext().getId()), relationVertex);
+
                 }
             } else {
                 Object additionalConcept = insertVertex(graphFrame, parent, arc.getCoreferenceLink(), Style.CONCEPT.name());
@@ -142,16 +139,15 @@ public class GraphPainter {
             if (additionalCheck.test(context, arc)) {
                 desiredConcept = arc.findConcept(context);
                 if (desiredConcept.isPresent()) {
-                    insertArrow(graphFrame, parent, relationVertex, conceptObjects.get(desiredConcept.get().getId()));
-                } else {
-                    desiredConcept = arc.findConcept(context.getOutermostGraph());
-                    if (desiredConcept.isPresent()) {
+                    if (Objects.equals(desiredConcept.get().getOwner(), relation.getOwner())) {
+                        insertArrow(graphFrame, parent, relationVertex, conceptObjects.get(desiredConcept.get().getId()));
+                    } else {
                         Object additionalConcept = insertVertex(graphFrame, parent, desiredConcept.get().getStringRepresentation(), Style.CONCEPT.name());
                         insertArrow(graphFrame, parent, relationVertex, additionalConcept);
                         insertCoreferenceLink(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), additionalConcept);
-                    } else {
-                        insertArrow(graphFrame, parent, relationVertex, graphObjects.get(arc.getContext().getId()));
                     }
+                } else {
+                    insertArrow(graphFrame, parent, relationVertex, graphObjects.get(arc.getContext().getId()));
                 }
             } else {
                 Object additionalConcept = insertVertex(graphFrame, parent, arc.getCoreferenceLink(), Style.CONCEPT.name());
@@ -235,7 +231,7 @@ public class GraphPainter {
 
     private Object getParentObject(mxGraph graphFrame, Context context) {
         return Optional.ofNullable(
-                context.getOwner() != null
+                !context.isOutermost()
                         ? graphObjects.get(context.getOwner().getId())
                         : graphFrame.getDefaultParent())
                 .orElseThrow(() -> new IllegalStateException("No object found for context: " + context));

@@ -26,7 +26,7 @@ public class CgifParser implements CgifParserConstants {
         this((Reader) null);
     }
 
-    public Graph parse(String content) throws ParseException {
+    public Context parse(String content) throws ParseException {
         InputStream is = new ByteArrayInputStream(content.getBytes());
         ReInit(is, StandardCharsets.UTF_8.name());
         topContext = new Context();
@@ -366,7 +366,7 @@ public class CgifParser implements CgifParserConstants {
         trace_call("arc");
         try {
             Arc arc = new Arc();
-            Graph context; // concept or context
+            Context context; // concept or context
             Concept concept;
             Token coreferenceLink;
             if (jj_2_6(3)) {
@@ -575,7 +575,7 @@ public class CgifParser implements CgifParserConstants {
         }
     }
 
-    final public Graph context(Graph enclosingGraph) throws ParseException {
+    final public Context context(Graph enclosingGraph) throws ParseException {
         trace_call("context");
         try {
             Context context = new Context();

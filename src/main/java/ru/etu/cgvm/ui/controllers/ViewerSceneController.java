@@ -118,7 +118,7 @@ public class ViewerSceneController {
     @FXML
     private void showAbout() {
         String message = String.format("%s%nVersion: %s",
-                SettingManager.getProperty("app.name"),
+                SettingManager.getProperty("app.description"),
                 SettingManager.getProperty("app.version"));
         showInfoAlert(message);
     }

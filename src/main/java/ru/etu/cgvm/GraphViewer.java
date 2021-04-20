@@ -34,10 +34,7 @@ public class GraphViewer extends javafx.application.Application {
     }
 
     // TODO: RDF support
-    // TODO: SELECT Special context Priority 1
-    // TODO: Save as XML
+    // TODO: SELECT Special context (Priority 1)
+    // TODO: Save as XML, cgif (priority 2)
     // TODO: Edit graph
-    // TODO: Fix visualization => DONE
-    // TODO: Fix lambda visualization (signature as related marks) => DONE
-    // TODO: wrap TypeHierarchy into context as metadata => DONE
 }

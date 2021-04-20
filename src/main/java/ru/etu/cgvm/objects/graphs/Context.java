@@ -3,17 +3,21 @@ package ru.etu.cgvm.objects.graphs;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import ru.etu.cgvm.objects.base.Graph;
+import ru.etu.cgvm.objects.base.GraphObject;
 
 import java.util.Arrays;
 import java.util.Optional;
+
+import static ru.etu.cgvm.objects.Constant.TILDA;
 
 @ToString
 @Getter
 public class Context extends Graph {
 
     private boolean isSpecialContext;
-    private String name; // if null => outermost graph
+    private String name; // if null or owner is null <=> outermost graph
 
     @Setter
     private boolean isNegated;
@@ -23,7 +27,6 @@ public class Context extends Graph {
     }
 
     public Context() {
-        super(Kind.CONTEXT);
     }
 
     public void setName(String name) {
@@ -33,7 +36,18 @@ public class Context extends Graph {
 
     @Override
     public String getStringRepresentation() {
-        return isNegated ? "~" : "" +
+        return isNegated ? TILDA : "" +
                 Optional.ofNullable(name).orElse("");
+    }
+
+    @Override
+    public boolean isIdentical(GraphObject other) {
+        if (other == null) return false;
+        if (other instanceof Context) {
+            Context otherContext = (Context) other;
+            return isNegated == otherContext.isNegated()
+                    && StringUtils.equalsIgnoreCase(name, otherContext.getName()); // Не проверяем объекты
+        }
+        return false;
     }
 }
