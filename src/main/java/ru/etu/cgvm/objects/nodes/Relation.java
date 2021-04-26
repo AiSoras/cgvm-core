@@ -1,6 +1,7 @@
 package ru.etu.cgvm.objects.nodes;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.etu.cgvm.objects.Arc;
@@ -12,12 +13,16 @@ import java.util.Objects;
 @ToString(callSuper = true)
 @Setter
 @Getter
+@NoArgsConstructor
 public class Relation extends Node {
 
     private Arc input;
     private Arc output;
 
-    public Relation() {
+    public Relation(Relation relation) {
+        super(relation);
+        input = new Arc(relation.getInput());
+        output = new Arc(relation.getOutput());
     }
 
     @Override
@@ -25,9 +30,9 @@ public class Relation extends Node {
         if (other == null) return false;
         if (other instanceof Relation
                 && Objects.equals(type, ((Node) other).getType())) {
-            Relation otherRelation = (Relation) other;
-            return input.isIdentical(otherRelation.getInput(), owner) // Проверяем и дуги, то есть вместо 1 объекта сразу 3
-                    && output.isIdentical(otherRelation.getOutput(), owner);
+            var otherRelation = (Relation) other;
+            return input.isIdentical(otherRelation.getInput(), owner.getOutermostGraph(), otherRelation.getOwner().getOutermostGraph())
+                    && output.isIdentical(otherRelation.getOutput(), owner.getOutermostGraph(), otherRelation.getOwner().getOutermostGraph());
         }
         return false;
     }

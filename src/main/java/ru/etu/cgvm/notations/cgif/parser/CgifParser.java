@@ -52,7 +52,8 @@ public class CgifParser implements CgifParserConstants {
             if (enclosingGraph == null) {
                 graph = topContext;
             } else {
-                graph = new Context(enclosingGraph);
+                graph = new Context();
+                enclosingGraph.addObject(graph);
             }
             label_1:
             while (true) {

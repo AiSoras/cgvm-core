@@ -22,6 +22,16 @@ public class Arc {
     @Setter
     private Context context; // В отношениях, в акторах используются только концепты
 
+    public Arc(Arc arc) {
+        if (arc.getConcept() != null) {
+            concept = new Concept(arc.getConcept());
+        } else if (arc.getContext() != null) {
+            context = new Context(arc.getContext());
+        } else {
+            coreferenceLink = arc.getCoreferenceLink();
+        }
+    }
+
     public void setCoreferenceLink(String coreferenceLink) {
         if (Optional.ofNullable(coreferenceLink).isPresent()) {
             this.coreferenceLink = coreferenceLink.replace("?", ""); //Всегда связанные метки
@@ -38,10 +48,10 @@ public class Arc {
         }
     }
 
-    public boolean isIdentical(Arc other, Graph owner) {
+    public boolean isIdentical(Arc other, Graph firstOwner, Graph secondOwner) {
         if (other == null) return false;
-        Optional<Concept> firstConcept = findConcept(owner);
-        Optional<Concept> secondConcept = other.findConcept(owner);
+        Optional<Concept> firstConcept = findConcept(firstOwner);
+        Optional<Concept> secondConcept = other.findConcept(secondOwner);
         if (firstConcept.isPresent() && secondConcept.isPresent()) {
             return firstConcept.get().isIdentical(secondConcept.get());
         } else {

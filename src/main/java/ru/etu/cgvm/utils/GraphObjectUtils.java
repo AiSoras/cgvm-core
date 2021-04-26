@@ -4,7 +4,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.base.GraphObject;
+import ru.etu.cgvm.objects.base.Node;
 import ru.etu.cgvm.objects.graphs.Context;
+import ru.etu.cgvm.objects.nodes.Actor;
+import ru.etu.cgvm.objects.nodes.Concept;
+import ru.etu.cgvm.objects.nodes.Relation;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -27,5 +31,16 @@ public class GraphObjectUtils {
         getNonNestedObjects(graph, Context.class)
                 .forEach(context -> objects.addAll(getAllObjects(context, objectClass)));
         return objects;
+    }
+
+    public static Node copyNode(Node node) {
+        if (node instanceof Concept) {
+            return new Concept((Concept) node);
+        } else if (node instanceof Relation) {
+            return new Relation((Relation) node);
+        } else if (node instanceof Actor) {
+            return new Actor((Actor) node);
+        }
+        throw new IllegalArgumentException("Creating copy error! Unsupported node class: " + node.getClass().getSimpleName());
     }
 }

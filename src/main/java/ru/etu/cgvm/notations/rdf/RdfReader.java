@@ -11,6 +11,7 @@ import java.io.InputStream;
 @Slf4j
 public class RdfReader {
 
+    // TODO
     private Model parseModel(String fileName) throws IRIException {
         Model model = ModelFactory.createDefaultModel();
         InputStream in = RDFDataMgr.open(fileName);

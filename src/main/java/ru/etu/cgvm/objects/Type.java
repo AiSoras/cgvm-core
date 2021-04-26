@@ -19,6 +19,11 @@ public class Type {
     @Getter
     private boolean isNegated;
 
+    public Type(Type type) {
+        name = type.getName();
+        isNegated = type.isNegated();
+    }
+
     public void setNegated(String tilde) {
         isNegated = StringUtils.isNotBlank(tilde);
     }
@@ -32,7 +37,7 @@ public class Type {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Type type = (Type) o;
+        var type = (Type) o;
         return isNegated == type.isNegated && StringUtils.equalsIgnoreCase(name, type.name);
     }
 

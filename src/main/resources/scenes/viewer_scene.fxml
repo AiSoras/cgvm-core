@@ -24,7 +24,7 @@
                 <ToggleButtonGroup fx:id="notationSelector" layoutX="197.0" layoutY="33.0" selectionType="SINGLE"
                                    AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
                     <ToggleButton selected="true" text="CGIF" textAlignment="CENTER"/>
-                    <ToggleButton text="RDF" textAlignment="CENTER"/>
+                   <!-- <ToggleButton text="RDF" textAlignment="CENTER"/> -->
                 </ToggleButtonGroup>
                 <Label layoutX="29.0" layoutY="33.0" text="Входной формат" AnchorPane.leftAnchor="30.0"
                        AnchorPane.topAnchor="33.0">
@@ -40,7 +40,8 @@
                 </Button>
                 <TextArea fx:id="input" layoutX="30.0" layoutY="55.0" prefHeight="150.0" prefWidth="200.0"
                           AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="85.0"/>
-                <TabPane layoutY="328.0" prefHeight="294.0" prefWidth="324.0" tabClosingPolicy="UNAVAILABLE"
+                <TabPane fx:id="queryTabs" layoutY="328.0" prefHeight="294.0" prefWidth="324.0"
+                         tabClosingPolicy="UNAVAILABLE"
                          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                          AnchorPane.topAnchor="325.0">
                     <Tab text="Запрос">
@@ -61,9 +62,10 @@
                             </TextArea>
                         </AnchorPane>
                     </Tab>
-                    <Tab text="Результат выполнения">
+                    <Tab text="Результат выполнения" fx:id="resultTab">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <TextArea editable="false" layoutX="14.0" layoutY="14.0" prefHeight="200.0"
+                            <TextArea fx:id="queryOutput" editable="false" layoutX="14.0" layoutY="14.0"
+                                      prefHeight="200.0"
                                       prefWidth="200.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0"
                                       AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
                                 <font>

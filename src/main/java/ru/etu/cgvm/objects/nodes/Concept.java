@@ -1,6 +1,7 @@
 package ru.etu.cgvm.objects.nodes;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.etu.cgvm.objects.Referent;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import static ru.etu.cgvm.objects.Constant.EMPTY;
 
 @ToString(callSuper = true)
+@NoArgsConstructor
 public class Concept extends Node {
 
     @Setter
@@ -23,7 +25,10 @@ public class Concept extends Node {
     @Getter
     private final Collection<String> coreferenceLinks = new LinkedList<>();
 
-    public Concept() {
+    public Concept(Concept concept) {
+        super(concept);
+        referent = Optional.ofNullable(concept.getReferent()).map(Referent::new).orElse(null);
+        coreferenceLinks.addAll(concept.getCoreferenceLinks());
     }
 
     public void addCoreferenceLink(String coreferenceLink) {
@@ -45,7 +50,7 @@ public class Concept extends Node {
     public boolean isIdentical(GraphObject other) {
         if (other == null) return false;
         if (other instanceof Concept) {
-            Concept otherConcept = (Concept) other;
+            var otherConcept = (Concept) other;
             return Objects.equals(type, otherConcept.getType()) // Проверяем тип концептов
                     && ((isAny() || otherConcept.isAny()) // Если {*}/<*>, то не смотрим на референт
                     || Objects.equals(referent, otherConcept.getReferent()));

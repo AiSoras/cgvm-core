@@ -1,5 +1,6 @@
 package ru.etu.cgvm.objects.graphs;
 
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import ru.etu.cgvm.objects.SignatureParameter;
@@ -13,10 +14,8 @@ import java.util.stream.Collectors;
 import static ru.etu.cgvm.objects.Constant.*;
 
 @ToString(callSuper = true)
+@NoArgsConstructor
 public class Lambda extends Graph {
-
-    public Lambda() {
-    }
 
     private final Collection<SignatureParameter> signatureParameters = new LinkedList<>();
 
@@ -39,13 +38,18 @@ public class Lambda extends Graph {
     public boolean isIdentical(GraphObject other) {
         if (other == null) return false;
         if (other instanceof Lambda) {
-            Lambda otherLambda = (Lambda) other;
-            return signatureParameters.size() == otherLambda.getSignatureParameters().size()
+            var otherLambda = (Lambda) other;
+            if (signatureParameters.size() == otherLambda.getSignatureParameters().size()
                     && signatureParameters.stream().allMatch(
                     signatureParameter ->
                             otherLambda.getSignatureParameters().stream()
-                                    .anyMatch(signatureParameter::isIdentical)
-            ); // Проверяем только сигнатуру, не залезая внутрь
+                                    .anyMatch(signatureParameter::isIdentical))) {
+                if (getObjects().size() < otherLambda.getObjects().size()) {
+                    return getObjects().stream().allMatch(thisObject -> otherLambda.getObjects().stream().anyMatch(thisObject::isIdentical));
+                } else {
+                    return otherLambda.getObjects().stream().allMatch(otherObject -> getObjects().stream().anyMatch(otherObject::isIdentical));
+                }
+            }
         }
         return false;
     }

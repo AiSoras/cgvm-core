@@ -5,19 +5,24 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import lombok.NoArgsConstructor;
 import ru.etu.cgvm.GraphViewer;
+import ru.etu.cgvm.notations.cgif.CgifGenerator;
 import ru.etu.cgvm.notations.cgif.parser.CgifParser;
+import ru.etu.cgvm.notations.cgif.parser.ParseException;
 import ru.etu.cgvm.objects.base.Graph;
+import ru.etu.cgvm.objects.graphs.Context;
+import ru.etu.cgvm.query.SelectProcessor;
 import ru.etu.cgvm.ui.GraphPainter;
+import ru.etu.cgvm.utils.GraphObjectUtils;
 import ru.etu.cgvm.utils.SettingManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static ru.etu.cgvm.utils.FileUtils.readContent;
 import static ru.etu.cgvm.utils.FileUtils.saveContentToFile;
@@ -26,6 +31,7 @@ import static ru.etu.cgvm.utils.FileUtils.saveContentToFile;
 public class ViewerSceneController {
 
     private static final FileChooser fileChooser = new FileChooser();
+    private static final CgifParser parser = new CgifParser();
 
     static {
         configureFileChooser(fileChooser);
@@ -41,6 +47,15 @@ public class ViewerSceneController {
     private TextArea queryInput;
 
     @FXML
+    private TextArea queryOutput;
+
+    @FXML
+    private Tab resultTab;
+
+    @FXML
+    private TabPane queryTabs;
+
+    @FXML
     private SwingNode canvas;
 
     @FXML
@@ -52,10 +67,11 @@ public class ViewerSceneController {
     private void drawGraph() {
         Graph graph = null;
         try {
-            switch (getSelectedNotation()) {
-                case CGIF -> graph = new CgifParser().parse(input.getText());
-                default -> /* RDF =RdfReader*/ showErrorAlert(new IllegalArgumentException("Only CGIF is supported!"));
-            }
+            //  switch (getSelectedNotation()) {
+            // case CGIF ->
+            graph = parser.parse(input.getText());
+            // default -> /* RDF =RdfReader*/ showErrorAlert(new IllegalArgumentException("Only CGIF is supported!"));
+            // }
         } catch (Exception e) {
             showErrorAlert(e);
         }
@@ -76,7 +92,22 @@ public class ViewerSceneController {
 
     @FXML
     private void executeQuery() {
-        String query = queryInput.getText();
+        try {
+            Context query = parser.parse(queryInput.getText());
+            Context originalGraph = parser.parse(input.getText());
+            var queryContext = GraphObjectUtils.getNonNestedObjects(query, Context.class).iterator().next(); // Обрабатываем только один запрос
+            if (!queryContext.isSpecialContext()) {
+                showInfoAlert("Выражение не является запросом!");
+            }
+            Collection<Context> results = SelectProcessor.select(originalGraph, queryContext);
+            queryOutput.setText(results.stream()
+                    .map(CgifGenerator::generate)
+                    .collect(Collectors.joining("\n***\n")));
+            queryTabs.getSelectionModel().select(resultTab);
+        } catch (ParseException e) {
+            showErrorAlert(e);
+        }
+
     }
 
     @FXML

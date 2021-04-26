@@ -1,7 +1,10 @@
 package ru.etu.cgvm.objects.base;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import ru.etu.cgvm.objects.Constant;
 import ru.etu.cgvm.objects.TypeHierarchy;
 import ru.etu.cgvm.objects.graphs.Context;
 import ru.etu.cgvm.objects.nodes.Concept;
@@ -12,19 +15,12 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Graph extends GraphObject {
 
     private final Collection<GraphObject> objectStore = new LinkedList<>();
     @Getter
     private final TypeHierarchy typeHierarchy = new TypeHierarchy();
-
-    protected Graph() {
-    }
-
-    protected Graph(Graph enclosingGraph) {
-        if (enclosingGraph != null)
-            enclosingGraph.addObject(this);
-    }
 
     public Collection<GraphObject> getObjects() {
         return new LinkedList<>(objectStore);
@@ -42,7 +38,7 @@ public abstract class Graph extends GraphObject {
     public Optional<Concept> getConceptByCoreferenceLink(String coreferenceLink) {
         Optional<Concept> desiredConcept = GraphObjectUtils.getNonNestedObjects(this, Concept.class).stream()
                 .filter(concept -> concept.getCoreferenceLinks().stream()
-                        .anyMatch(link -> link.equalsIgnoreCase("*" + coreferenceLink)))
+                        .anyMatch(link -> link.equalsIgnoreCase(Constant.STAR_MARK + coreferenceLink)))
                 .findFirst();
         if (desiredConcept.isPresent()) {
             return desiredConcept;
@@ -60,13 +56,12 @@ public abstract class Graph extends GraphObject {
         if (isOutermost()) {
             return this;
         } else {
-            Graph graph = this.getOwner();
-            while (!isOutermost()) {
+            var graph = this.getOwner();
+            while (!graph.isOutermost()) {
                 graph = graph.getOwner();
             }
             return graph;
         }
-
     }
 
     public Collection<Context> getNestedContexts() { // Сохраняется порядок: первые = внешние контексты ! Но не включает самый верхний

@@ -137,7 +137,8 @@ void graph(Graph enclosingGraph): {
     if (enclosingGraph == null) {
         graph = topContext;
     } else {
-        graph = new Context(enclosingGraph);
+        graph = new Context();
+        enclosingGraph.addObject(graph);
     }
 } {
     (term(graph))+

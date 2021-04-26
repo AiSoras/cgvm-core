@@ -23,6 +23,12 @@ public class Referent {
     private Designation designation;
     private boolean isNegated;
 
+    public Referent(Referent referent) {
+        isNegated = referent.isNegated();
+        descriptor = Optional.ofNullable(referent.getDescriptor()).map(Descriptor::new).orElse(null);
+        designation = Optional.ofNullable(referent.getDesignation()).map(Designation::new).orElse(null);
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -33,6 +39,13 @@ public class Referent {
         private String literal;
         private String locator;
         private String quantifier;
+
+        private Designation(Designation designation) {
+            additionalInfo = designation.getAdditionalInfo();
+            literal = designation.getLiteral();
+            locator = designation.getLocator();
+            quantifier = designation.getQuantifier();
+        }
 
         @Override
         public String toString() {
@@ -52,6 +65,11 @@ public class Referent {
     public static final class Descriptor {
         private String additionalInfo;
         private String structure;
+
+        private Descriptor(Descriptor descriptor) {
+            additionalInfo = descriptor.getAdditionalInfo();
+            structure = descriptor.getStructure();
+        }
 
         public List<String> getStructureMembers() {
             return Arrays.stream(getElementEnumeration()
