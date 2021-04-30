@@ -6,6 +6,7 @@ import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.base.GraphObject;
 import ru.etu.cgvm.objects.base.Node;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +40,12 @@ public class Actor extends Node {
 
     public List<Arc> getOutputArcs() {
         return new LinkedList<>(outputArcs);
+    }
+
+    public Collection<Arc> getArcs() {
+        Collection<Arc> arcs = getInputArcs();
+        arcs.addAll(outputArcs);
+        return arcs;
     }
 
     @Override

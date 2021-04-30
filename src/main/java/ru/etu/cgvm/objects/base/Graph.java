@@ -22,6 +22,10 @@ public abstract class Graph extends GraphObject {
     @Getter
     private final TypeHierarchy typeHierarchy = new TypeHierarchy();
 
+    protected Graph(Graph graph) {
+        super(graph);
+    }
+
     public Collection<GraphObject> getObjects() {
         return new LinkedList<>(objectStore);
     }
@@ -71,5 +75,25 @@ public abstract class Graph extends GraphObject {
             copy.forEach(context -> contexts.addAll(context.getNestedContexts()));
         }
         return contexts;
+    }
+
+    public Optional<GraphObject> getObjectById(String id) {
+        if (this.id.equals(id)) {
+            return Optional.of(this);
+        }
+
+        Optional<GraphObject> desiredObject = objectStore.stream().filter(object -> object.getId().equals(id)).findFirst();
+        if (desiredObject.isPresent()) {
+            return desiredObject;
+        }
+
+        Collection<Context> contexts = GraphObjectUtils.getNonNestedObjects(this, Context.class);
+        for (Context context : contexts) {
+            desiredObject = context.getObjectById(id);
+            if (desiredObject.isPresent()) {
+                return desiredObject;
+            }
+        }
+        return Optional.empty();
     }
 }

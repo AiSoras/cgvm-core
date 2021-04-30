@@ -20,7 +20,7 @@ public class Arc {
     private Concept concept;
     private String coreferenceLink;
     @Setter
-    private Context context; // В отношениях, в акторах используются только концепты
+    private Context context; // В отношениях. В акторах используются только концепты
 
     public Arc(Arc arc) {
         if (arc.getConcept() != null) {

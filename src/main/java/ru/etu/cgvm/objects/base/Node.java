@@ -17,6 +17,7 @@ public abstract class Node extends GraphObject {
     protected Type type;
 
     protected Node(Node node) {
+        super(node);
         type = Optional.ofNullable(node.getType()).map(Type::new).orElse(null);
     }
 

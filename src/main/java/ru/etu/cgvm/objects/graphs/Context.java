@@ -25,6 +25,7 @@ public class Context extends Graph {
     private boolean isNegated;
 
     public Context(Context context) { // Не копируем объекты, а только саму "оболочку"
+        super(context);
         isSpecialContext = context.isSpecialContext();
         name = context.getName();
         isNegated = context.isNegated();

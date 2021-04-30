@@ -2,10 +2,14 @@ package ru.etu.cgvm.query;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.base.GraphObject;
 import ru.etu.cgvm.objects.base.Node;
 import ru.etu.cgvm.objects.graphs.Context;
+import ru.etu.cgvm.objects.nodes.Actor;
+import ru.etu.cgvm.objects.nodes.Concept;
+import ru.etu.cgvm.objects.nodes.Relation;
 import ru.etu.cgvm.utils.GraphObjectUtils;
 
 import java.util.*;
@@ -15,11 +19,36 @@ import java.util.stream.IntStream;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SelectProcessor {
 
+    public static Collection<Context> getValidContexts(Collection<Context> contexts) {
+        return contexts.stream().filter(SelectProcessor::isValid).collect(Collectors.toList());
+    }
+
+    private static boolean isValid(Context context) {
+        Collection<Arc> arcs = GraphObjectUtils.getAllObjects(context, Relation.class).stream()
+                .flatMap(relation -> relation.getArcs().stream()).collect(Collectors.toList());
+        arcs.addAll(GraphObjectUtils.getAllObjects(context, Actor.class).stream()
+                .flatMap(actor -> actor.getArcs().stream()).collect(Collectors.toList()));
+        return arcs.stream().allMatch(arc -> {
+            if (arc.getConcept() != null) {
+                Optional<GraphObject> foundConcept = context.getObjectById(arc.getConcept().getId());
+                foundConcept.ifPresent(graphObject -> arc.setConcept((Concept) graphObject));
+                return foundConcept.isPresent();
+            } else if (arc.getContext() != null) {
+                Optional<GraphObject> foundContext = context.getObjectById(arc.getContext().getId());
+                foundContext.ifPresent(graphObject -> arc.setContext((Context) graphObject));
+                return foundContext.isPresent();
+            } else {
+                Optional<Concept> foundConcept = arc.findConcept(context);
+                return foundConcept.isPresent();
+            }
+        });
+    }
+
     public static Collection<Context> select(final Context originalGraph, final Context query) {
         Collection<Context> result = new LinkedList<>();
         Map<Context, Map<GraphObject, Collection<GraphObject>>> overlaps = getContextsWithFullProjection(originalGraph, query);
         overlaps.forEach((originalContext, overlap) -> result.addAll(getObjectsContexts(originalContext, overlap)));
-        return result;
+        return getValidContexts(result);
     }
 
     private static Collection<Context> getObjectsContexts(final Context context, final Map<GraphObject, Collection<GraphObject>> overlap) {
