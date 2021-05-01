@@ -90,17 +90,17 @@ public class GraphPainter {
         actorList.forEach(actor -> actorObjects.put(actor.getId(), insertVertex(graphFrame, parent, actor.getStringRepresentation(), Style.ACTOR.name())));
 
         actorList.forEach(actor -> {
-            Object actorVertex = actorObjects.get(actor.getId());
+            var actorVertex = actorObjects.get(actor.getId());
 
             Arc arc;
             List<Arc> inputArcs = actor.getInputArcs();
-            for (int order = 1; order <= inputArcs.size(); order++) {
+            for (var order = 1; order <= inputArcs.size(); order++) {
                 arc = inputArcs.get(order - 1);
                 insertArrow(graphFrame, parent, order, conceptObjects.get(arc.findConcept(context).get().getId()), actorVertex);
             }
 
             List<Arc> outputArcs = actor.getOutputArcs();
-            for (int order = 1; order <= outputArcs.size(); order++) {
+            for (var order = 1; order <= outputArcs.size(); order++) {
                 arc = outputArcs.get(order - 1);
                 insertArrow(graphFrame, parent, order, actorVertex, conceptObjects.get(arc.findConcept(context).get().getId()));
             }
@@ -112,10 +112,10 @@ public class GraphPainter {
         relationList.forEach(relation -> relationObjects.put(relation.getId(), insertVertex(graphFrame, parent, relation.getStringRepresentation(), Style.RELATION.name())));
 
         relationList.forEach(relation -> {
-            Object relationVertex = relationObjects.get(relation.getId());
+            var relationVertex = relationObjects.get(relation.getId());
             Optional<Concept> desiredConcept;
 
-            Arc arc = relation.getInput();
+            var arc = relation.getInput();
             if (additionalCheck.test(context, arc)) {
                 desiredConcept = arc.findConcept(context);
                 if (desiredConcept.isPresent()) {
@@ -200,7 +200,7 @@ public class GraphPainter {
     }
 
     private mxGraph initGraphFrame() {
-        mxGraph graph = new mxGraph();
+        var graph = new mxGraph();
         configureGraph(graph);
         mxStylesheet stylesheet = graph.getStylesheet();
         stylesheet.putCellStyle(Style.RELATION.name(), RELATION_STYLE);
@@ -215,7 +215,7 @@ public class GraphPainter {
     private void addContexts(mxGraph graphFrame, Graph outermostGraph) {
         graphObjects.put(outermostGraph.getId(), graphFrame.getDefaultParent());
 
-        Collection<Context> nestedContext = outermostGraph.getNestedContexts();
+        Collection<Context> nestedContext = GraphObjectUtils.getAllObjects(outermostGraph, Context.class);
         nestedContext.forEach(context ->
                 graphObjects.put(context.getId(),
                         insertVertex(graphFrame, getParentObject(graphFrame, context), context.getStringRepresentation(), Style.CONTEXT.name()))
@@ -245,13 +245,13 @@ public class GraphPainter {
         graphFrame.getModel().endUpdate();
         optimizeObjectsLayout(graphFrame);
 
-        mxGraphComponent graphComponent = new mxGraphComponent(graphFrame);
+        var graphComponent = new mxGraphComponent(graphFrame);
         configureGraphComponent(graphComponent);
         return graphComponent;
     }
 
     private void optimizeObjectsLayout(mxGraph graphFrame) {
-        mxCompactTreeLayout layout = new mxCompactTreeLayout(graphFrame);
+        var layout = new mxCompactTreeLayout(graphFrame);
         List<Map.Entry<String, Object>> entries = new LinkedList<>(graphObjects.entrySet());
         Collections.reverse(entries);
         entries.stream().map(Map.Entry::getValue).forEach(layout::execute);

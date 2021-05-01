@@ -11,7 +11,7 @@
     <properties>
         <slf4j.version>1.7.30</slf4j.version>
         <javacc.version>7.0.10</javacc.version>
-        <jackson.version>2.11.1</jackson.version>
+        <jackson.version>2.12.3</jackson.version>
         <jena.version>4.0.0</jena.version>
         <jgrapht.version>1.5.1</jgrapht.version>
         <lombok.version>1.18.18</lombok.version>
@@ -79,6 +79,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 

@@ -24,14 +24,14 @@ public class CgifGenerator {
     private CgifGenerator() {
     }
 
-    public static String generate(Context topContext) {
+    public static String convert(Context topContext) {
         translatedIds.clear();
         return translateContext(topContext);
     }
 
     private static String translateContext(final Context context) {
         translatedIds.add(context.getId());
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         if (context.isNegated()) {
             builder.append(TILDA);
         }
@@ -51,7 +51,7 @@ public class CgifGenerator {
 
     private static String translateLambda(final Lambda lambda) {
         translatedIds.add(lambda.getId());
-        StringBuilder builder = new StringBuilder(LEFT_PARENTHESIS);
+        var builder = new StringBuilder(LEFT_PARENTHESIS);
         builder.append(lambda.getStringRepresentation());
         // Для корректного отображения вложенных концептов и контектов в отношения
         GraphObjectUtils.getNonNestedObjects(lambda, Relation.class).forEach(relation -> builder.append(translateGraphObject(relation)));

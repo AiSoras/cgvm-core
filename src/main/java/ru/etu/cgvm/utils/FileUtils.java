@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 public class FileUtils {
 
     public static void saveContentToFile(final String content, final File file) throws FileNotFoundException {
-        PrintWriter writer = new PrintWriter(file);
+        var writer = new PrintWriter(file);
         writer.println(content);
         writer.close();
     }

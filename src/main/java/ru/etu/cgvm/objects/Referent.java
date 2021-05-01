@@ -1,5 +1,8 @@
 package ru.etu.cgvm.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +22,11 @@ import static ru.etu.cgvm.objects.Constant.*;
 public class Referent {
 
     // Взаимоисключающие поля
+    @JsonInclude
     private Descriptor descriptor;
+    @JsonInclude
     private Designation designation;
+    @JacksonXmlProperty(isAttribute = true, localName = "isNegated")
     private boolean isNegated;
 
     public Referent(Referent referent) {
@@ -34,10 +40,14 @@ public class Referent {
     @NoArgsConstructor
     @EqualsAndHashCode
     public static final class Designation {
+        @JacksonXmlProperty(isAttribute = true)
         private String additionalInfo;
         // Взаимоисключающие поля
+        @JacksonXmlProperty(isAttribute = true)
         private String literal;
+        @JacksonXmlProperty(isAttribute = true)
         private String locator;
+        @JacksonXmlProperty(isAttribute = true)
         private String quantifier;
 
         private Designation(Designation designation) {
@@ -63,7 +73,9 @@ public class Referent {
     @NoArgsConstructor
     @EqualsAndHashCode
     public static final class Descriptor {
+        @JacksonXmlProperty(isAttribute = true)
         private String additionalInfo;
+        @JacksonXmlProperty(isAttribute = true)
         private String structure;
 
         private Descriptor(Descriptor descriptor) {
@@ -71,16 +83,19 @@ public class Referent {
             structure = descriptor.getStructure();
         }
 
+        @JsonIgnore
         public List<String> getStructureMembers() {
             return Arrays.stream(getElementEnumeration()
                     .split(",")).map(String::trim).collect(Collectors.toList());
         }
 
+        @JsonIgnore
         private boolean isAnyElement() {
             return getElementEnumeration()
                     .equals(Constant.ALL_SET_ELEMENTS);
         }
 
+        @JsonIgnore
         private String getElementEnumeration() {
             return Optional.ofNullable(structure)
                     .orElse(EMPTY)
@@ -94,6 +109,7 @@ public class Referent {
         }
     }
 
+    @JsonIgnore
     public boolean isAny() {
         return Optional.ofNullable(descriptor).orElse(new Descriptor()).isAnyElement();
     }

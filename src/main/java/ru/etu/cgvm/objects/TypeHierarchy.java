@@ -1,5 +1,8 @@
 package ru.etu.cgvm.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -23,7 +26,11 @@ public class TypeHierarchy {
         LT
     }
 
+    @JacksonXmlElementWrapper(localName = "typeOrders")
+    @JacksonXmlProperty(localName = "order")
     private final List<Triple<String, Order, String>> typeOrders = new LinkedList<>();
+    @JacksonXmlElementWrapper(localName = "typeDefinitions")
+    @JacksonXmlProperty(localName = "definition")
     private final List<Pair<String, Lambda>> typeDefinitions = new LinkedList<>();
 
     public void addTypeOrder(String firstType, String secondType, String order) {
@@ -34,10 +41,12 @@ public class TypeHierarchy {
         typeDefinitions.add(new ImmutablePair<>(firstType, typeDefinition));
     }
 
+    @JsonIgnore
     public List<Triple<String, Order, String>> getTypeOrders() {
         return new LinkedList<>(typeOrders);
     }
 
+    @JsonIgnore
     public List<Pair<String, Lambda>> getTypeDefinitions() {
         return new LinkedList<>(typeDefinitions);
     }

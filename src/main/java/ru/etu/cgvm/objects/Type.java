@@ -1,5 +1,8 @@
 package ru.etu.cgvm.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,8 +18,9 @@ public class Type {
 
     @Setter
     @Getter
+    @JacksonXmlText
     private String name = "";
-    @Getter
+    @JacksonXmlProperty(isAttribute = true)
     private boolean isNegated;
 
     public Type(Type type) {
@@ -26,6 +30,11 @@ public class Type {
 
     public void setNegated(String tilde) {
         isNegated = StringUtils.isNotBlank(tilde);
+    }
+
+    @JsonIgnore
+    public boolean isNegated() {
+        return isNegated;
     }
 
     @Override

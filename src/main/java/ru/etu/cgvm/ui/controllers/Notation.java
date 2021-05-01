@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 public enum Notation {
     CGIF("CGIF files", "*.cgif"),
+    XML("XML files", "*.xml"),
     RDF("RDF files", "*.rdf");
 
     private final String fileType;

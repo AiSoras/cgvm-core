@@ -1,5 +1,7 @@
 package ru.etu.cgvm.objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,8 +16,10 @@ public class SignatureParameter {
 
     @Setter
     @Getter
+    @JsonInclude
     private Type type;
     @Getter
+    @JacksonXmlProperty(isAttribute = true)
     private String variable;
 
     public void setVariable(String variable) {

@@ -9,7 +9,6 @@ import lombok.Getter;
 import ru.etu.cgvm.utils.SettingManager;
 
 import java.io.InputStream;
-import java.net.URL;
 
 public class GraphViewer extends javafx.application.Application {
 
@@ -22,7 +21,7 @@ public class GraphViewer extends javafx.application.Application {
         stage.setResizable(false);
 
         stage.setTitle(SettingManager.getProperty("app.title"));
-        URL url = getClass().getResource(SettingManager.getProperty("app.fxml"));
+        var url = getClass().getResource(SettingManager.getProperty("app.fxml"));
         InputStream iconStream = getClass().getResourceAsStream(SettingManager.getProperty("app.icon.path"));
         stage.getIcons().add(new Image(iconStream));
         stage.setScene(new Scene(FXMLLoader.load(url)));
@@ -32,9 +31,4 @@ public class GraphViewer extends javafx.application.Application {
     public static void main(String[] args) {
         Application.launch();
     }
-
-    // TODO: RDF support
-    // TODO: SELECT Special context (Priority 1)
-    // TODO: Save as XML, cgif (priority 2)
-    // TODO: Edit graph
 }

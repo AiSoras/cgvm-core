@@ -1,6 +1,7 @@
 package ru.etu.cgvm.objects.graphs;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,14 +15,15 @@ import java.util.Optional;
 import static ru.etu.cgvm.objects.Constant.TILDA;
 
 @ToString
-@Getter
 @NoArgsConstructor
 public class Context extends Graph {
 
+    @JacksonXmlProperty(isAttribute = true)
     private boolean isSpecialContext;
+    @JacksonXmlProperty(isAttribute = true, localName = "name")
     private String name; // if null or owner is null <=> outermost graph
-
     @Setter
+    @JacksonXmlProperty(isAttribute = true)
     private boolean isNegated;
 
     public Context(Context context) { // Не копируем объекты, а только саму "оболочку"
@@ -31,12 +33,28 @@ public class Context extends Graph {
         isNegated = context.isNegated();
     }
 
+    @JsonIgnore
+    public boolean isSpecialContext() {
+        return isSpecialContext;
+    }
+
+    @JsonIgnore
+    public String getName() {
+        return name;
+    }
+
+    @JsonIgnore
+    public boolean isNegated() {
+        return isNegated;
+    }
+
     public void setName(String name) {
         this.name = name;
         this.isSpecialContext = Arrays.stream(SpecialContext.values()).anyMatch(value -> value.name().equalsIgnoreCase(name));
     }
 
     @Override
+    @JsonIgnore
     public String getStringRepresentation() {
         return isNegated ? TILDA : "" +
                 Optional.ofNullable(name).orElse("");

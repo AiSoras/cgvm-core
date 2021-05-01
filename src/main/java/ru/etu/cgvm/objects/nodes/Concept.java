@@ -1,5 +1,9 @@
 package ru.etu.cgvm.objects.nodes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,8 +25,10 @@ public class Concept extends Node {
 
     @Setter
     @Getter
+    @JsonInclude
     private Referent referent;
-    @Getter
+    @JacksonXmlElementWrapper(localName = "coreferenceLinks")
+    @JacksonXmlProperty(localName = "link")
     private final Collection<String> coreferenceLinks = new LinkedList<>();
 
     public Concept(Concept concept) {
@@ -37,11 +43,18 @@ public class Concept extends Node {
         }
     }
 
+    @JsonIgnore
+    public Collection<String> getCoreferenceLinks() {
+        return new LinkedList<>(coreferenceLinks);
+    }
+
+    @JsonIgnore
     public boolean isAny() {
         return Optional.ofNullable(referent).orElse(new Referent()).isAny();
     }
 
     @Override
+    @JsonIgnore
     public String getStringRepresentation() {
         return super.getStringRepresentation() + (referent == null ? EMPTY : (": " + referent));
     }

@@ -8,10 +8,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import ru.etu.cgvm.GraphViewer;
 import ru.etu.cgvm.notations.cgif.CgifGenerator;
 import ru.etu.cgvm.notations.cgif.parser.CgifParser;
 import ru.etu.cgvm.notations.cgif.parser.ParseException;
+import ru.etu.cgvm.notations.xml.XmlGenerator;
+import ru.etu.cgvm.notations.xml.XmlParser;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.graphs.Context;
 import ru.etu.cgvm.query.SelectProcessor;
@@ -20,7 +23,6 @@ import ru.etu.cgvm.utils.GraphObjectUtils;
 import ru.etu.cgvm.utils.SettingManager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -65,21 +67,25 @@ public class ViewerSceneController {
 
     @FXML
     private void drawGraph() {
-        Graph graph = null;
-        try {
-            //  switch (getSelectedNotation()) {
-            // case CGIF ->
-            graph = parser.parse(input.getText());
-            // default -> /* RDF =RdfReader*/ showErrorAlert(new IllegalArgumentException("Only CGIF is supported!"));
-            // }
-        } catch (Exception e) {
-            showErrorAlert(e);
-        }
-
+        Graph graph = parseGraph();
         if (graph != null) {
             mxGraphComponent graphComponent = new GraphPainter().drawGraph(graph);
             canvas.setContent(graphComponent);
         }
+    }
+
+    private Context parseGraph() {
+        Context context = null;
+        try {
+            context = switch (getSelectedNotation()) {
+                case CGIF -> parser.parse(input.getText());
+                case XML -> XmlParser.parse(input.getText(), Context.class);
+                default -> throw new IllegalArgumentException("Unsupported notation!");
+            };
+        } catch (Exception e) {
+            showErrorAlert(e);
+        }
+        return context;
     }
 
     @FXML
@@ -101,7 +107,7 @@ public class ViewerSceneController {
             }
             Collection<Context> results = SelectProcessor.select(originalGraph, queryContext);
             queryOutput.setText(results.stream()
-                    .map(CgifGenerator::generate)
+                    .map(CgifGenerator::convert)
                     .collect(Collectors.joining("\n***\n")));
             queryTabs.getSelectionModel().select(resultTab);
         } catch (ParseException e) {
@@ -122,7 +128,7 @@ public class ViewerSceneController {
 
     @FXML
     private void openFile() {
-        File file = fileChooser.showOpenDialog(GraphViewer.getPrimaryStage());
+        var file = fileChooser.showOpenDialog(GraphViewer.getPrimaryStage());
         if (file != null) {
             try {
                 String content = readContent(file);
@@ -135,12 +141,27 @@ public class ViewerSceneController {
 
     @FXML
     private void saveAsFile() {
-        File file = fileChooser.showSaveDialog(GraphViewer.getPrimaryStage());
+        var file = fileChooser.showSaveDialog(GraphViewer.getPrimaryStage());
         if (file != null) {
             try {
-                saveContentToFile(input.getText(), file);
+                var fileExtension = StringUtils.substringAfterLast(file.getName(), '.');
+                var fileNotation = Notation.valueOf(fileExtension.toUpperCase());
+                if (getSelectedNotation() == fileNotation) {
+                    saveContentToFile(input.getText(), file);
+                } else {
+                    var context = parseGraph();
+                    if (context != null) {
+                        switch (fileNotation) {
+                            case XML -> saveContentToFile(XmlGenerator.convert(context), file);
+                            case CGIF -> saveContentToFile(CgifGenerator.convert(context), file);
+                            default -> throw new IllegalArgumentException("Unsupported file notation!");
+                        }
+                    } else {
+                        return;
+                    }
+                }
                 showInfoAlert(String.format("The file [%s] is saved successfully!", file.getAbsolutePath()));
-            } catch (FileNotFoundException e) {
+            } catch (Exception e) {
                 showErrorAlert(e);
             }
         }
@@ -148,7 +169,7 @@ public class ViewerSceneController {
 
     @FXML
     private void showAbout() {
-        String message = String.format("%s%nVersion: %s",
+        var message = String.format("%s%nVersion: %s",
                 SettingManager.getProperty("app.description"),
                 SettingManager.getProperty("app.version"));
         showInfoAlert(message);
@@ -159,7 +180,7 @@ public class ViewerSceneController {
     }
 
     private void showErrorAlert(Exception exception) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+        var alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(exception.getClass().getSimpleName());
         alert.setHeaderText("The exception is occurred!");
         alert.setContentText("Details: " + exception.getMessage());
@@ -167,7 +188,7 @@ public class ViewerSceneController {
     }
 
     private void showInfoAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        var alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Information");
         alert.setHeaderText(message);
         alert.showAndWait();
@@ -178,6 +199,7 @@ public class ViewerSceneController {
                 new File(SettingManager.getProperty("file.default_folder"))
         );
         fileChooser.getExtensionFilters().add(Notation.CGIF.getFileFilter());
-        fileChooser.getExtensionFilters().add(Notation.RDF.getFileFilter());
+        fileChooser.getExtensionFilters().add(Notation.XML.getFileFilter());
+        // fileChooser.getExtensionFilters().add(Notation.RDF.getFileFilter());
     }
 }

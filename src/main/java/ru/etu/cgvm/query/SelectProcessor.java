@@ -2,14 +2,11 @@ package ru.etu.cgvm.query;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.base.GraphObject;
 import ru.etu.cgvm.objects.base.Node;
 import ru.etu.cgvm.objects.graphs.Context;
-import ru.etu.cgvm.objects.nodes.Actor;
 import ru.etu.cgvm.objects.nodes.Concept;
-import ru.etu.cgvm.objects.nodes.Relation;
 import ru.etu.cgvm.utils.GraphObjectUtils;
 
 import java.util.*;
@@ -24,11 +21,7 @@ public class SelectProcessor {
     }
 
     private static boolean isValid(Context context) {
-        Collection<Arc> arcs = GraphObjectUtils.getAllObjects(context, Relation.class).stream()
-                .flatMap(relation -> relation.getArcs().stream()).collect(Collectors.toList());
-        arcs.addAll(GraphObjectUtils.getAllObjects(context, Actor.class).stream()
-                .flatMap(actor -> actor.getArcs().stream()).collect(Collectors.toList()));
-        return arcs.stream().allMatch(arc -> {
+        return context.getArcs().stream().allMatch(arc -> {
             if (arc.getConcept() != null) {
                 Optional<GraphObject> foundConcept = context.getObjectById(arc.getConcept().getId());
                 foundConcept.ifPresent(graphObject -> arc.setConcept((Concept) graphObject));

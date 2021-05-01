@@ -1,5 +1,7 @@
 package ru.etu.cgvm.objects.nodes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +20,9 @@ import java.util.Objects;
 @NoArgsConstructor
 public class Relation extends Node {
 
+    @JsonInclude
     private Arc input;
+    @JsonInclude
     private Arc output;
 
     public Relation(Relation relation) {
@@ -27,6 +31,7 @@ public class Relation extends Node {
         output = new Arc(relation.getOutput());
     }
 
+    @JsonIgnore
     public Collection<Arc> getArcs() {
         return Arrays.asList(input, output);
     }

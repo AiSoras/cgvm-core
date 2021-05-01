@@ -1,5 +1,8 @@
 package ru.etu.cgvm.objects.nodes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import ru.etu.cgvm.objects.Arc;
@@ -17,7 +20,12 @@ import java.util.stream.IntStream;
 @NoArgsConstructor
 public class Actor extends Node {
 
+    @JacksonXmlElementWrapper(localName = "input")
+    @JacksonXmlProperty(localName = "arc")
     private final List<Arc> inputArcs = new LinkedList<>();
+
+    @JacksonXmlElementWrapper(localName = "output")
+    @JacksonXmlProperty(localName = "arc")
     private final List<Arc> outputArcs = new LinkedList<>();
 
     public Actor(Actor actor) {
@@ -30,6 +38,7 @@ public class Actor extends Node {
         inputArcs.add(arc);
     }
 
+    @JsonIgnore
     public List<Arc> getInputArcs() {
         return new LinkedList<>(inputArcs);
     }
@@ -38,10 +47,12 @@ public class Actor extends Node {
         outputArcs.add(arc);
     }
 
+    @JsonIgnore
     public List<Arc> getOutputArcs() {
         return new LinkedList<>(outputArcs);
     }
 
+    @JsonIgnore
     public Collection<Arc> getArcs() {
         Collection<Arc> arcs = getInputArcs();
         arcs.addAll(outputArcs);

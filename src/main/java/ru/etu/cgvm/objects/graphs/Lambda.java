@@ -1,5 +1,8 @@
 package ru.etu.cgvm.objects.graphs;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
@@ -17,8 +20,11 @@ import static ru.etu.cgvm.objects.Constant.*;
 @NoArgsConstructor
 public class Lambda extends Graph {
 
+    @JacksonXmlElementWrapper(localName = "signature")
+    @JacksonXmlProperty(localName = "parameter")
     private final Collection<SignatureParameter> signatureParameters = new LinkedList<>();
 
+    @JsonIgnore
     public Collection<SignatureParameter> getSignatureParameters() {
         return new LinkedList<>(signatureParameters);
     }
@@ -28,6 +34,7 @@ public class Lambda extends Graph {
     }
 
     @Override
+    @JsonIgnore
     public String getStringRepresentation() {
         return LAMBDA + SPACE + signatureParameters.stream()
                 .map(SignatureParameter::getStringRepresentation)

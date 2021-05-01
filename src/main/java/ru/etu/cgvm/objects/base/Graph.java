@@ -1,35 +1,48 @@
 package ru.etu.cgvm.objects.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import ru.etu.cgvm.objects.Arc;
 import ru.etu.cgvm.objects.Constant;
 import ru.etu.cgvm.objects.TypeHierarchy;
 import ru.etu.cgvm.objects.graphs.Context;
+import ru.etu.cgvm.objects.nodes.Actor;
 import ru.etu.cgvm.objects.nodes.Concept;
+import ru.etu.cgvm.objects.nodes.Relation;
 import ru.etu.cgvm.utils.GraphObjectUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Graph extends GraphObject {
 
+    @JacksonXmlElementWrapper(localName = "objects")
+    @JacksonXmlProperty(localName = "object")
     private final Collection<GraphObject> objectStore = new LinkedList<>();
     @Getter
+    @JsonInclude
     private final TypeHierarchy typeHierarchy = new TypeHierarchy();
 
     protected Graph(Graph graph) {
         super(graph);
     }
 
+    @JsonIgnore
     public Collection<GraphObject> getObjects() {
         return new LinkedList<>(objectStore);
     }
 
+    @JsonIgnore
     public boolean isOutermost() {
         return owner == null;
     }
@@ -39,6 +52,16 @@ public abstract class Graph extends GraphObject {
         objectStore.add(object);
     }
 
+    @JsonIgnore
+    public Collection<Arc> getArcs() {
+        Collection<Arc> arcs = GraphObjectUtils.getAllObjects(this, Relation.class).stream()
+                .flatMap(relation -> relation.getArcs().stream()).collect(Collectors.toList());
+        arcs.addAll(GraphObjectUtils.getAllObjects(this, Actor.class).stream()
+                .flatMap(actor -> actor.getArcs().stream()).collect(Collectors.toList()));
+        return arcs;
+    }
+
+    @JsonIgnore
     public Optional<Concept> getConceptByCoreferenceLink(String coreferenceLink) {
         Optional<Concept> desiredConcept = GraphObjectUtils.getNonNestedObjects(this, Concept.class).stream()
                 .filter(concept -> concept.getCoreferenceLinks().stream()
@@ -56,6 +79,7 @@ public abstract class Graph extends GraphObject {
         return Optional.empty();
     }
 
+    @JsonIgnore
     public Graph getOutermostGraph() {
         if (isOutermost()) {
             return this;
@@ -68,15 +92,7 @@ public abstract class Graph extends GraphObject {
         }
     }
 
-    public Collection<Context> getNestedContexts() { // Сохраняется порядок: первые = внешние контексты ! Но не включает самый верхний
-        Collection<Context> contexts = GraphObjectUtils.getNonNestedObjects(this, Context.class);
-        Collection<Context> copy = new LinkedList<>(contexts);
-        if (!contexts.isEmpty()) {
-            copy.forEach(context -> contexts.addAll(context.getNestedContexts()));
-        }
-        return contexts;
-    }
-
+    @JsonIgnore
     public Optional<GraphObject> getObjectById(String id) {
         if (this.id.equals(id)) {
             return Optional.of(this);
