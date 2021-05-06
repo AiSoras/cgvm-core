@@ -17,6 +17,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Deque;
+import java.util.LinkedList;
 
 public class CgifParser implements CgifParserConstants {
 
@@ -404,14 +406,28 @@ public class CgifParser implements CgifParserConstants {
             Relation relation = new Relation();
             Type type;
             Arc arc;
+            Deque<Arc> arcs = new LinkedList<>();
             jj_consume_token(LPAREN);
             type = type();
-            arc = arc(enclosingGraph);
-            relation.setInput(arc);
-            arc = arc(enclosingGraph);
-            relation.setOutput(arc);
+            label_3:
+            while (true) {
+                arc = arc(enclosingGraph);
+                arcs.add(arc);
+                switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
+                    case LBRACKET:
+                    case TILDE:
+                    case RELATED_MARK: {
+                        break;
+                    }
+                    default:
+                        jj_la1[16] = jj_gen;
+                        break label_3;
+                }
+            }
             jj_consume_token(RPAREN);
             relation.setType(type);
+            relation.setOutput(arcs.pollLast()); // n-ая дуга исходящая, оставшиеся — входящие
+            relation.addInputArcs(arcs);
             enclosingGraph.addObject(relation);
         } finally {
             trace_return("relation");
@@ -426,7 +442,7 @@ public class CgifParser implements CgifParserConstants {
             Arc arc;
             jj_consume_token(LESSTHAN);
             type = type();
-            label_3:
+            label_4:
             while (true) {
                 arc = arc(g);
                 actor.addInputArc(arc);
@@ -437,12 +453,12 @@ public class CgifParser implements CgifParserConstants {
                         break;
                     }
                     default:
-                        jj_la1[16] = jj_gen;
-                        break label_3;
+                        jj_la1[17] = jj_gen;
+                        break label_4;
                 }
             }
             jj_consume_token(BAR);
-            label_4:
+            label_5:
             while (true) {
                 arc = arc(g);
                 actor.addOutputArc(arc);
@@ -453,8 +469,8 @@ public class CgifParser implements CgifParserConstants {
                         break;
                     }
                     default:
-                        jj_la1[17] = jj_gen;
-                        break label_4;
+                        jj_la1[18] = jj_gen;
+                        break label_5;
                 }
             }
             jj_consume_token(GREATERTHAN);
@@ -478,15 +494,15 @@ public class CgifParser implements CgifParserConstants {
                 case IDENTIFIER: {
                     signatureParameter = parameter();
                     lambda.addSignatureParameter(signatureParameter);
-                    label_5:
+                    label_6:
                     while (true) {
                         switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
                             case COMMA: {
                                 break;
                             }
                             default:
-                                jj_la1[18] = jj_gen;
-                                break label_5;
+                                jj_la1[19] = jj_gen;
+                                break label_6;
                         }
                         jj_consume_token(COMMA);
                         signatureParameter = parameter();
@@ -495,10 +511,10 @@ public class CgifParser implements CgifParserConstants {
                     break;
                 }
                 default:
-                    jj_la1[19] = jj_gen;
+                    jj_la1[20] = jj_gen;
             }
             jj_consume_token(RPAREN);
-            label_6:
+            label_7:
             while (true) {
                 term(lambda);
                 switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
@@ -509,8 +525,8 @@ public class CgifParser implements CgifParserConstants {
                         break;
                     }
                     default:
-                        jj_la1[20] = jj_gen;
-                        break label_6;
+                        jj_la1[21] = jj_gen;
+                        break label_7;
                 }
             }
             jj_consume_token(RPAREN);
@@ -538,7 +554,7 @@ public class CgifParser implements CgifParserConstants {
                     break;
                 }
                 default:
-                    jj_la1[21] = jj_gen;
+                    jj_la1[22] = jj_gen;
             }
             signatureParameter.setType(type);
             {
@@ -563,7 +579,7 @@ public class CgifParser implements CgifParserConstants {
                     break;
                 }
                 default:
-                    jj_la1[22] = jj_gen;
+                    jj_la1[23] = jj_gen;
             }
             name = jj_consume_token(IDENTIFIER);
             type.setName(name.image);
@@ -586,7 +602,7 @@ public class CgifParser implements CgifParserConstants {
                     jj_consume_token(TILDE);
                     context.setNegated(true);
                     jj_consume_token(LBRACKET);
-                    label_7:
+                    label_8:
                     while (true) {
                         term(context);
                         switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
@@ -597,8 +613,8 @@ public class CgifParser implements CgifParserConstants {
                                 break;
                             }
                             default:
-                                jj_la1[23] = jj_gen;
-                                break label_7;
+                                jj_la1[24] = jj_gen;
+                                break label_8;
                         }
                     }
                     jj_consume_token(RBRACKET);
@@ -614,9 +630,9 @@ public class CgifParser implements CgifParserConstants {
                             break;
                         }
                         default:
-                            jj_la1[24] = jj_gen;
+                            jj_la1[25] = jj_gen;
                     }
-                    label_8:
+                    label_9:
                     while (true) {
                         term(context);
                         switch (jj_ntk == -1 ? jj_ntk_f() : jj_ntk) {
@@ -627,15 +643,15 @@ public class CgifParser implements CgifParserConstants {
                                 break;
                             }
                             default:
-                                jj_la1[25] = jj_gen;
-                                break label_8;
+                                jj_la1[26] = jj_gen;
+                                break label_9;
                         }
                     }
                     jj_consume_token(RBRACKET);
                     break;
                 }
                 default:
-                    jj_la1[26] = jj_gen;
+                    jj_la1[27] = jj_gen;
                     jj_consume_token(-1);
                     throw new ParseException();
             }
@@ -656,7 +672,7 @@ public class CgifParser implements CgifParserConstants {
             jj_consume_token(LBRACKET);
             jj_consume_token(TYPEHIERARCHY);
             jj_consume_token(COLON);
-            label_9:
+            label_10:
             while (true) {
                 if (jj_2_8(2)) {
                     conceptTypeDefinition(g);
@@ -667,7 +683,7 @@ public class CgifParser implements CgifParserConstants {
                             break;
                         }
                         default:
-                            jj_la1[27] = jj_gen;
+                            jj_la1[28] = jj_gen;
                             jj_consume_token(-1);
                             throw new ParseException();
                     }
@@ -677,8 +693,8 @@ public class CgifParser implements CgifParserConstants {
                         break;
                     }
                     default:
-                        jj_la1[28] = jj_gen;
-                        break label_9;
+                        jj_la1[29] = jj_gen;
+                        break label_10;
                 }
             }
             jj_consume_token(RBRACKET);
@@ -694,7 +710,7 @@ public class CgifParser implements CgifParserConstants {
             jj_consume_token(LBRACKET);
             jj_consume_token(RELATIONHIERARCHY);
             jj_consume_token(COLON);
-            label_10:
+            label_11:
             while (true) {
                 if (jj_2_9(2)) {
                     relationTypeDefinition(g);
@@ -705,7 +721,7 @@ public class CgifParser implements CgifParserConstants {
                             break;
                         }
                         default:
-                            jj_la1[29] = jj_gen;
+                            jj_la1[30] = jj_gen;
                             jj_consume_token(-1);
                             throw new ParseException();
                     }
@@ -715,8 +731,8 @@ public class CgifParser implements CgifParserConstants {
                         break;
                     }
                     default:
-                        jj_la1[30] = jj_gen;
-                        break label_10;
+                        jj_la1[31] = jj_gen;
+                        break label_11;
                 }
             }
             jj_consume_token(RBRACKET);
@@ -962,43 +978,6 @@ public class CgifParser implements CgifParserConstants {
         }
     }
 
-    private boolean jj_3R_35() {
-        return jj_3R_39();
-    }
-
-    private boolean jj_3R_16() {
-        if (jj_scan_token(LPAREN)) return true;
-        return jj_scan_token(DEF);
-    }
-
-    private boolean jj_3R_38() {
-        return jj_scan_token(LPAREN);
-    }
-
-    private boolean jj_3_2() {
-        return jj_3R_12();
-    }
-
-    private boolean jj_3R_26() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_30()) {
-            jj_scanpos = xsp;
-            return jj_3R_31();
-        }
-        return false;
-    }
-
-    private boolean jj_3R_30() {
-        if (jj_scan_token(COLON)) return true;
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3_4()) jj_scanpos = xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_33()) jj_scanpos = xsp;
-        return false;
-    }
-
     private boolean jj_3R_36() {
         return jj_3R_40();
     }
@@ -1008,43 +987,80 @@ public class CgifParser implements CgifParserConstants {
         return jj_scan_token(DEF);
     }
 
+    private boolean jj_3R_39() {
+        return jj_scan_token(LPAREN);
+    }
+
+    private boolean jj_3_2() {
+        return jj_3R_13();
+    }
+
+    private boolean jj_3R_27() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_31()) {
+            jj_scanpos = xsp;
+            return jj_3R_32();
+        }
+        return false;
+    }
+
     private boolean jj_3R_31() {
+        if (jj_scan_token(COLON)) return true;
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3_4()) jj_scanpos = xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_34()) jj_scanpos = xsp;
+        return false;
+    }
+
+    private boolean jj_3R_37() {
+        return jj_3R_41();
+    }
+
+    private boolean jj_3R_18() {
+        if (jj_scan_token(LPAREN)) return true;
+        return jj_scan_token(DEF);
+    }
+
+    private boolean jj_3R_32() {
         return jj_scan_token(TILDE);
     }
 
-    private boolean jj_3R_15() {
+    private boolean jj_3_4() {
+        return jj_3R_15();
+    }
+
+    private boolean jj_3R_16() {
         Token xsp;
         xsp = jj_scanpos;
-        if (jj_3R_23()) jj_scanpos = xsp;
+        if (jj_3R_24()) jj_scanpos = xsp;
         return jj_scan_token(IDENTIFIER);
     }
 
-    private boolean jj_3_4() {
-        return jj_3R_14();
-    }
-
-    private boolean jj_3R_23() {
+    private boolean jj_3R_24() {
         return jj_scan_token(TILDE);
     }
 
     private boolean jj_3_1() {
-        return jj_3R_11();
+        return jj_3R_12();
     }
 
-    private boolean jj_3R_32() {
+    private boolean jj_3R_33() {
         Token xsp;
         xsp = jj_scanpos;
         if (jj_3_1()) {
             jj_scanpos = xsp;
-            if (jj_3R_34()) {
+            if (jj_3R_35()) {
                 jj_scanpos = xsp;
-                if (jj_3R_35()) {
+                if (jj_3R_36()) {
                     jj_scanpos = xsp;
                     if (jj_3_2()) {
                         jj_scanpos = xsp;
                         if (jj_3_3()) {
                             jj_scanpos = xsp;
-                            return jj_3R_36();
+                            return jj_3R_37();
                         }
                     }
                 }
@@ -1053,38 +1069,34 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
-    private boolean jj_3R_11() {
+    private boolean jj_3R_12() {
         if (jj_scan_token(LBRACKET)) return true;
         Token xsp;
         xsp = jj_scanpos;
         if (jj_3_5()) jj_scanpos = xsp;
         xsp = jj_scanpos;
-        if (jj_3R_18()) jj_scanpos = xsp;
-        xsp = jj_scanpos;
         if (jj_3R_19()) jj_scanpos = xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_20()) jj_scanpos = xsp;
         return jj_scan_token(RBRACKET);
     }
 
-    private boolean jj_3R_39() {
-        return jj_scan_token(LESSTHAN);
-    }
-
-    private boolean jj_3R_18() {
+    private boolean jj_3R_19() {
         Token xsp;
         xsp = jj_scanpos;
-        if (jj_3R_24()) {
+        if (jj_3R_25()) {
             jj_scanpos = xsp;
-            return jj_3R_25();
+            return jj_3R_26();
         }
         return false;
     }
 
-    private boolean jj_3R_24() {
+    private boolean jj_3R_25() {
         Token xsp;
-        if (jj_3R_29()) return true;
+        if (jj_3R_30()) return true;
         while (true) {
             xsp = jj_scanpos;
-            if (jj_3R_29()) {
+            if (jj_3R_30()) {
                 jj_scanpos = xsp;
                 break;
             }
@@ -1092,37 +1104,31 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
-    private boolean jj_3R_29() {
+    private boolean jj_3R_40() {
+        return jj_scan_token(LESSTHAN);
+    }
+
+    private boolean jj_3R_30() {
         return jj_scan_token(RELATED_MARK);
     }
 
-    private boolean jj_3R_37() {
+    private boolean jj_3R_38() {
         Token xsp;
         xsp = jj_scanpos;
-        if (jj_3R_41()) {
+        if (jj_3R_42()) {
             jj_scanpos = xsp;
-            if (jj_3R_42()) {
+            if (jj_3R_43()) {
                 jj_scanpos = xsp;
-                return jj_3R_43();
+                return jj_3R_44();
             }
         }
         return false;
     }
 
-    private boolean jj_3R_12() {
+    private boolean jj_3R_42() {
         Token xsp;
         xsp = jj_scanpos;
-        if (jj_3R_20()) {
-            jj_scanpos = xsp;
-            return jj_3R_21();
-        }
-        return false;
-    }
-
-    private boolean jj_3R_41() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_44()) jj_scanpos = xsp;
+        if (jj_3R_45()) jj_scanpos = xsp;
         xsp = jj_scanpos;
         if (jj_scan_token(38)) {
             jj_scanpos = xsp;
@@ -1134,51 +1140,32 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
-    private boolean jj_3R_44() {
+    private boolean jj_3R_45() {
         return jj_scan_token(ADDITIONAL_INFO);
     }
 
-    private boolean jj_3R_45() {
+    private boolean jj_3R_46() {
         return jj_scan_token(POUNDSIGN);
     }
 
-    private boolean jj_3R_20() {
-        if (jj_scan_token(TILDE)) return true;
-        if (jj_scan_token(LBRACKET)) return true;
+    private boolean jj_3R_13() {
         Token xsp;
-        if (jj_3R_27()) return true;
-        while (true) {
-            xsp = jj_scanpos;
-            if (jj_3R_27()) {
-                jj_scanpos = xsp;
-                break;
-            }
+        xsp = jj_scanpos;
+        if (jj_3R_21()) {
+            jj_scanpos = xsp;
+            return jj_3R_22();
         }
         return false;
     }
 
     private boolean jj_3_3() {
-        return jj_3R_13();
-    }
-
-    private boolean jj_3R_19() {
-        return jj_3R_26();
-    }
-
-    private boolean jj_3R_25() {
-        return jj_scan_token(DEFINING_MARK);
-    }
-
-    private boolean jj_3_5() {
-        return jj_3R_15();
+        return jj_3R_14();
     }
 
     private boolean jj_3R_21() {
+        if (jj_scan_token(TILDE)) return true;
         if (jj_scan_token(LBRACKET)) return true;
-        if (jj_scan_token(IDENTIFIER)) return true;
         Token xsp;
-        xsp = jj_scanpos;
-        if (jj_scan_token(14)) jj_scanpos = xsp;
         if (jj_3R_28()) return true;
         while (true) {
             xsp = jj_scanpos;
@@ -1190,74 +1177,103 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
-    private boolean jj_3R_42() {
+    private boolean jj_3R_20() {
+        return jj_3R_27();
+    }
+
+    private boolean jj_3R_26() {
+        return jj_scan_token(DEFINING_MARK);
+    }
+
+    private boolean jj_3_5() {
+        return jj_3R_16();
+    }
+
+    private boolean jj_3R_43() {
         Token xsp;
         xsp = jj_scanpos;
         if (jj_scan_token(42)) {
             jj_scanpos = xsp;
             if (jj_scan_token(49)) {
                 jj_scanpos = xsp;
-                return jj_3R_45();
+                return jj_3R_46();
             }
         }
         return false;
     }
 
-    private boolean jj_3R_43() {
+    private boolean jj_3R_22() {
+        if (jj_scan_token(LBRACKET)) return true;
+        if (jj_scan_token(IDENTIFIER)) return true;
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_scan_token(14)) jj_scanpos = xsp;
+        if (jj_3R_29()) return true;
+        while (true) {
+            xsp = jj_scanpos;
+            if (jj_3R_29()) {
+                jj_scanpos = xsp;
+                break;
+            }
+        }
+        return false;
+    }
+
+    private boolean jj_3R_44() {
         return jj_scan_token(QUANTIFIER);
     }
 
-    private boolean jj_3R_27() {
-        return jj_3R_32();
+    private boolean jj_3R_35() {
+        return jj_3R_39();
     }
 
-    private boolean jj_3R_13() {
+    private boolean jj_3R_28() {
+        return jj_3R_33();
+    }
+
+    private boolean jj_3R_14() {
         if (jj_scan_token(LBRACKET)) return true;
         if (jj_scan_token(TYPEHIERARCHY)) return true;
         return jj_scan_token(COLON);
     }
 
-    private boolean jj_3R_34() {
-        return jj_3R_38();
-    }
-
-    private boolean jj_3_8() {
-        return jj_3R_16();
-    }
-
     private boolean jj_3_6() {
-        return jj_3R_11();
-    }
-
-    private boolean jj_3R_28() {
-        return jj_3R_32();
-    }
-
-    private boolean jj_3R_40() {
-        return jj_scan_token(LBRACKET);
-    }
-
-    private boolean jj_3_9() {
-        return jj_3R_17();
-    }
-
-    private boolean jj_3R_14() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_22()) jj_scanpos = xsp;
-        return jj_scan_token(STRUCTURE);
-    }
-
-    private boolean jj_3_7() {
         return jj_3R_12();
     }
 
-    private boolean jj_3R_22() {
+    private boolean jj_3_8() {
+        return jj_3R_17();
+    }
+
+    private boolean jj_3R_15() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_23()) jj_scanpos = xsp;
+        return jj_scan_token(STRUCTURE);
+    }
+
+    private boolean jj_3R_29() {
+        return jj_3R_33();
+    }
+
+    private boolean jj_3R_41() {
+        return jj_scan_token(LBRACKET);
+    }
+
+    private boolean jj_3_7() {
+        return jj_3R_13();
+    }
+
+    private boolean jj_3R_23() {
         return jj_scan_token(ADDITIONAL_INFO);
     }
 
-    private boolean jj_3R_33() {
-        return jj_3R_37();
+    private boolean jj_3_9() {
+        return jj_3R_18();
+    }
+
+    private boolean jj_3R_34() {
+        return jj_3R_38();
     }
 
     /**
@@ -1277,7 +1293,7 @@ public class CgifParser implements CgifParserConstants {
     private Token jj_scanpos, jj_lastpos;
     private int jj_la;
     private int jj_gen;
-    final private int[] jj_la1 = new int[31];
+    final private int[] jj_la1 = new int[32];
     static private int[] jj_la1_0;
     static private int[] jj_la1_1;
 
@@ -1287,11 +1303,11 @@ public class CgifParser implements CgifParserConstants {
     }
 
     private static void jj_la1_init_0() {
-        jj_la1_0 = new int[]{0x20401400, 0x400400, 0x1000, 0x0, 0x0, 0x0, 0x100000, 0x100000, 0x0, 0x100000, 0x20004000, 0x0, 0x0, 0x0, 0x20004000, 0x0, 0x20001000, 0x20001000, 0x20000, 0x20000000, 0x20401400, 0x0, 0x20000000, 0x20401400, 0x4000, 0x20401400, 0x20001000, 0x400, 0x400, 0x400, 0x400,};
+        jj_la1_0 = new int[]{0x20401400, 0x400400, 0x1000, 0x0, 0x0, 0x0, 0x100000, 0x100000, 0x0, 0x100000, 0x20004000, 0x0, 0x0, 0x0, 0x20004000, 0x0, 0x20001000, 0x20001000, 0x20001000, 0x20000, 0x20000000, 0x20401400, 0x0, 0x20000000, 0x20401400, 0x4000, 0x20401400, 0x20001000, 0x400, 0x400, 0x400, 0x400,};
     }
 
     private static void jj_la1_init_1() {
-        jj_la1_1 = new int[]{0x0, 0x0, 0x0, 0x800, 0x2c0, 0x20040, 0x20400, 0x21ec0, 0x800, 0x21ec0, 0x0, 0x40000, 0xc0000, 0xc0000, 0x0, 0x40000, 0x40000, 0x40000, 0x0, 0x20000, 0x0, 0x80000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,};
+        jj_la1_1 = new int[]{0x0, 0x0, 0x0, 0x800, 0x2c0, 0x20040, 0x20400, 0x21ec0, 0x800, 0x21ec0, 0x0, 0x40000, 0xc0000, 0xc0000, 0x0, 0x40000, 0x40000, 0x40000, 0x40000, 0x0, 0x20000, 0x0, 0x80000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,};
     }
 
     private final JJCalls[] jj_2_rtns = new JJCalls[9];
@@ -1323,7 +1339,7 @@ public class CgifParser implements CgifParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 32; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -1352,7 +1368,7 @@ public class CgifParser implements CgifParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 32; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -1367,7 +1383,7 @@ public class CgifParser implements CgifParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 31; i++)
+        for (int i = 0; i < 32; i++)
             jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++)
             jj_2_rtns[i] = new JJCalls();
@@ -1392,7 +1408,7 @@ public class CgifParser implements CgifParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 31; i++)
+        for (int i = 0; i < 32; i++)
             jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++)
             jj_2_rtns[i] = new JJCalls();
@@ -1408,7 +1424,7 @@ public class CgifParser implements CgifParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 32; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -1422,7 +1438,7 @@ public class CgifParser implements CgifParserConstants {
         token = new Token();
         jj_ntk = -1;
         jj_gen = 0;
-        for (int i = 0; i < 31; i++) jj_la1[i] = -1;
+        for (int i = 0; i < 32; i++) jj_la1[i] = -1;
         for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
     }
 
@@ -1581,7 +1597,7 @@ public class CgifParser implements CgifParserConstants {
             la1tokens[jj_kind] = true;
             jj_kind = -1;
         }
-        for (int i = 0; i < 31; i++) {
+        for (int i = 0; i < 32; i++) {
             if (jj_la1[i] == jj_gen) {
                 for (int j = 0; j < 32; j++) {
                     if ((jj_la1_0[i] & (1 << j)) != 0) {

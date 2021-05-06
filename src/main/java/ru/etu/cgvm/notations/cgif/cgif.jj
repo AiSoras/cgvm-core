@@ -22,6 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Deque;
+import java.util.LinkedList;
 
 public class CgifParser {
 
@@ -257,17 +259,19 @@ void relation(Graph enclosingGraph): {
     Relation relation = new Relation();
     Type type;
     Arc arc;
+    Deque<Arc> arcs = new LinkedList<>();
 } {
-    <LPAREN> type = type() arc = arc(enclosingGraph)
+    <LPAREN> type = type() (
+    arc = arc(enclosingGraph)
     {
-        relation.setInput(arc);
-    } arc = arc(enclosingGraph)
-    {
-        relation.setOutput(arc);
+        arcs.add(arc);
     }
+    )+
     <RPAREN>
     {
         relation.setType(type);
+        relation.setOutput(arcs.pollLast()); // n-ая дуга исходящая, оставшиеся — входящие
+        relation.addInputArcs(arcs);
         enclosingGraph.addObject(relation);
     }
 }

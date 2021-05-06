@@ -35,19 +35,21 @@ public class CgifGenerator {
         if (context.isNegated()) {
             builder.append(TILDA);
         }
-        if (!context.isOutermost()) {
-            builder.append(LEFT_BRACKET);
-        }
+        builder.append(LEFT_BRACKET);
         builder.append(Optional.ofNullable(context.getName()).orElse(EMPTY));
         // Для корректного отображения вложенных концептов и контектов в отношения
         GraphObjectUtils.getNonNestedObjects(context, Relation.class).forEach(relation -> builder.append(translateGraphObject(relation)));
         // Далее - все оставшиеся объекты
         context.getObjects().forEach(object -> builder.append(translateGraphObject(object)));
-        if (!context.isOutermost()) {
-            builder.append(RIGHT_BRACKET);
-        }
+        builder.append(RIGHT_BRACKET);
         return builder.toString();
     }
+
+    /* // TODO
+    [Proposition[Person *x3:  Petrov]]
+        ***
+    [[Person *x1:  Ivanov]]
+     */
 
     private static String translateLambda(final Lambda lambda) {
         translatedIds.add(lambda.getId());
@@ -76,8 +78,8 @@ public class CgifGenerator {
     private static String translateRelation(final Relation relation) {
         return LEFT_PARENTHESIS
                 + relation.getStringRepresentation()
-                + SPACE + translateArc(relation.getInput())
-                + SPACE + translateArc(relation.getOutput())
+                + relation.getInputArcs().stream().map(CgifGenerator::translateArc).collect(Collectors.joining(SPACE, SPACE, SPACE))
+                + translateArc(relation.getOutput())
                 + RIGHT_PARENTHESIS;
     }
 

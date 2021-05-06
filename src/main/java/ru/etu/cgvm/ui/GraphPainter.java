@@ -107,6 +107,7 @@ public class GraphPainter {
         });
     }
 
+    // TODO: refactor
     private void addRelations(mxGraph graphFrame, Object parent, Graph context, BiPredicate<Graph, Arc> additionalCheck) {
         Collection<Relation> relationList = GraphObjectUtils.getNonNestedObjects(context, Relation.class);
         relationList.forEach(relation -> relationObjects.put(relation.getId(), insertVertex(graphFrame, parent, relation.getStringRepresentation(), Style.RELATION.name())));
@@ -115,24 +116,28 @@ public class GraphPainter {
             var relationVertex = relationObjects.get(relation.getId());
             Optional<Concept> desiredConcept;
 
-            var arc = relation.getInput();
-            if (additionalCheck.test(context, arc)) {
-                desiredConcept = arc.findConcept(context);
-                if (desiredConcept.isPresent()) {
-                    if (Objects.equals(desiredConcept.get().getOwner(), relation.getOwner())) { // То есть лежат в одном контексте
-                        insertArrow(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), relationVertex);
+            Arc arc;
+            List<Arc> inputArcs = relation.getInputArcs();
+            for (var order = 1; order <= inputArcs.size(); order++) {
+                arc = inputArcs.get(order - 1);
+                if (additionalCheck.test(context, arc)) {
+                    desiredConcept = arc.findConcept(context);
+                    if (desiredConcept.isPresent()) {
+                        if (Objects.equals(desiredConcept.get().getOwner(), relation.getOwner())) { // То есть лежат в одном контексте
+                            insertArrow(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), relationVertex);
+                        } else {
+                            Object additionalConcept = insertVertex(graphFrame, parent, desiredConcept.get().getStringRepresentation(), Style.CONCEPT.name());
+                            insertArrow(graphFrame, parent, additionalConcept, relationVertex);
+                            insertCoreferenceLink(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), additionalConcept);
+                        }
                     } else {
-                        Object additionalConcept = insertVertex(graphFrame, parent, desiredConcept.get().getStringRepresentation(), Style.CONCEPT.name());
-                        insertArrow(graphFrame, parent, additionalConcept, relationVertex);
-                        insertCoreferenceLink(graphFrame, parent, conceptObjects.get(desiredConcept.get().getId()), additionalConcept);
+                        insertArrow(graphFrame, parent, graphObjects.get(arc.getContext().getId()), relationVertex);
+
                     }
                 } else {
-                    insertArrow(graphFrame, parent, graphObjects.get(arc.getContext().getId()), relationVertex);
-
+                    Object additionalConcept = insertVertex(graphFrame, parent, arc.getCoreferenceLink(), Style.CONCEPT.name());
+                    insertArrow(graphFrame, parent, additionalConcept, relationVertex);
                 }
-            } else {
-                Object additionalConcept = insertVertex(graphFrame, parent, arc.getCoreferenceLink(), Style.CONCEPT.name());
-                insertArrow(graphFrame, parent, additionalConcept, relationVertex);
             }
 
             arc = relation.getOutput();

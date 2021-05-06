@@ -67,19 +67,19 @@ public class ViewerSceneController {
 
     @FXML
     private void drawGraph() {
-        Graph graph = parseGraph();
+        Graph graph = parseGraph(input.getText());
         if (graph != null) {
             mxGraphComponent graphComponent = new GraphPainter().drawGraph(graph);
             canvas.setContent(graphComponent);
         }
     }
 
-    private Context parseGraph() {
+    private Context parseGraph(String text) {
         Context context = null;
         try {
             context = switch (getSelectedNotation()) {
-                case CGIF -> parser.parse(input.getText());
-                case XML -> XmlParser.parse(input.getText(), Context.class);
+                case CGIF -> parser.parse(text);
+                case XML -> XmlParser.parse(text, Context.class);
                 default -> throw new IllegalArgumentException("Unsupported notation!");
             };
         } catch (Exception e) {
@@ -100,7 +100,7 @@ public class ViewerSceneController {
     private void executeQuery() {
         try {
             Context query = parser.parse(queryInput.getText());
-            Context originalGraph = parser.parse(input.getText());
+            Context originalGraph = parseGraph(input.getText());
             var queryContext = GraphObjectUtils.getNonNestedObjects(query, Context.class).iterator().next(); // Обрабатываем только один запрос
             if (!queryContext.isSpecialContext()) {
                 showInfoAlert("Выражение не является запросом!");
@@ -113,7 +113,6 @@ public class ViewerSceneController {
         } catch (ParseException e) {
             showErrorAlert(e);
         }
-
     }
 
     @FXML
@@ -149,7 +148,7 @@ public class ViewerSceneController {
                 if (getSelectedNotation() == fileNotation) {
                     saveContentToFile(input.getText(), file);
                 } else {
-                    var context = parseGraph();
+                    var context = parseGraph(input.getText());
                     if (context != null) {
                         switch (fileNotation) {
                             case XML -> saveContentToFile(XmlGenerator.convert(context), file);
