@@ -35,21 +35,19 @@ public class CgifGenerator {
         if (context.isNegated()) {
             builder.append(TILDA);
         }
-        builder.append(LEFT_BRACKET);
+        if (context.getName() != null) {
+            builder.append(LEFT_BRACKET);
+        }
         builder.append(Optional.ofNullable(context.getName()).orElse(EMPTY));
         // Для корректного отображения вложенных концептов и контектов в отношения
         GraphObjectUtils.getNonNestedObjects(context, Relation.class).forEach(relation -> builder.append(translateGraphObject(relation)));
         // Далее - все оставшиеся объекты
         context.getObjects().forEach(object -> builder.append(translateGraphObject(object)));
-        builder.append(RIGHT_BRACKET);
+        if (context.getName() != null) {
+            builder.append(RIGHT_BRACKET);
+        }
         return builder.toString();
     }
-
-    /* // TODO
-    [Proposition[Person *x3:  Petrov]]
-        ***
-    [[Person *x1:  Ivanov]]
-     */
 
     private static String translateLambda(final Lambda lambda) {
         translatedIds.add(lambda.getId());
