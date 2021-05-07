@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import ru.etu.cgvm.GraphViewer;
 import ru.etu.cgvm.notations.cgif.CgifGenerator;
@@ -30,6 +31,7 @@ import static ru.etu.cgvm.utils.FileUtils.readContent;
 import static ru.etu.cgvm.utils.FileUtils.saveContentToFile;
 
 @NoArgsConstructor
+@Slf4j
 public class ViewerSceneController {
 
     private static final FileChooser fileChooser = new FileChooser();
@@ -179,6 +181,8 @@ public class ViewerSceneController {
     }
 
     private void showErrorAlert(Exception exception) {
+        log.error(exception.getMessage());
+
         var alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(exception.getClass().getSimpleName());
         alert.setHeaderText("The exception is occurred!");

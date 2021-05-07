@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Context class="context" id="8500f615-8061-4614-8e5c-f4b5899eb8af" isSpecialContext="false" isNegated="false">
+  <typeHierarchy>
+    <typeOrders/>
+    <typeDefinitions/>
+  </typeHierarchy>
+  <objects>
+    <object class="concept" id="929f7189-574e-4a14-812c-02a1d09a926b">
+      <type isNegated="false">Person</type>
+      <referent isNegated="false">
+        <descriptor/>
+        <designation locator="Ivanov"/>
+      </referent>
+      <coreferenceLinks>
+        <link>*x1</link>
+      </coreferenceLinks>
+    </object>
+    <object class="concept" id="37bb02b6-2d20-4563-8d9b-c499a0da151f">
+      <type isNegated="false">Think</type>
+      <referent/>
+      <coreferenceLinks>
+        <link>*x2</link>
+      </coreferenceLinks>
+    </object>
+    <object class="relation" id="c4c8c0e7-7b7a-479b-81ce-9e6d3a00eab8">
+      <type isNegated="false">Agnt</type>
+      <output coreferenceLink="x1"/>
+      <input>
+        <arc coreferenceLink="x2"/>
+      </input>
+    </object>
+    <object class="context" id="807bf38c-0fd3-47b9-b877-0b89c400222e" isSpecialContext="false" isNegated="false"
+            name="Proposition">
+      <typeHierarchy>
+        <typeOrders/>
+        <typeDefinitions/>
+      </typeHierarchy>
+      <objects>
+        <object class="concept" id="3479dcc7-89cd-42fa-978c-d16cadd94271">
+          <type isNegated="false">Person</type>
+          <referent isNegated="false">
+            <descriptor/>
+            <designation locator="Petrov"/>
+          </referent>
+          <coreferenceLinks>
+            <link>*x3</link>
+          </coreferenceLinks>
+        </object>
+        <object class="concept" id="73ce6bf1-5480-4b3d-9a34-d3ab7869a902">
+          <type isNegated="false">Want</type>
+          <referent/>
+          <coreferenceLinks>
+            <link>*x4</link>
+          </coreferenceLinks>
+        </object>
+        <object class="relation" id="b709f699-6117-4752-b69b-ac10bb7f9eeb">
+          <type isNegated="false">Agnt</type>
+          <output coreferenceLink="x3"/>
+          <input>
+            <arc coreferenceLink="x4"/>
+          </input>
+        </object>
+        <object class="context" id="36567a22-7ddf-4d29-a400-3737ac4bcae2" isSpecialContext="false" isNegated="false"
+                name="Situation">
+          <typeHierarchy>
+            <typeOrders/>
+            <typeDefinitions/>
+          </typeHierarchy>
+          <objects>
+            <object class="concept" id="afef4e11-3f05-4d04-a7d8-0a29f0791682">
+              <type isNegated="false">Learn</type>
+              <referent/>
+              <coreferenceLinks>
+                <link>*x5</link>
+              </coreferenceLinks>
+            </object>
+            <object class="relation" id="b520d785-698f-4e58-9ea8-819e050e93ea">
+              <type isNegated="false">Agnt</type>
+              <output coreferenceLink="x3"/>
+              <input>
+                <arc graphObjectId="afef4e11-3f05-4d04-a7d8-0a29f0791682"/>
+              </input>
+            </object>
+            <object class="concept" id="bb641cf1-5cfc-42dd-beba-c89a5566f9d4">
+              <type isNegated="false">University</type>
+              <referent/>
+              <coreferenceLinks/>
+            </object>
+            <object class="relation" id="da972f38-cd4d-4c5c-b7b5-4c85de7e8334">
+              <type isNegated="false">Thme</type>
+              <output graphObjectId="bb641cf1-5cfc-42dd-beba-c89a5566f9d4"/>
+              <input>
+                <arc coreferenceLink="x5"/>
+              </input>
+            </object>
+          </objects>
+        </object>
+        <object class="relation" id="4773ab1c-1a08-4a90-84a4-9763b8296ce3">
+          <type isNegated="false">Thme</type>
+          <output graphObjectId="36567a22-7ddf-4d29-a400-3737ac4bcae2"/>
+          <input>
+            <arc coreferenceLink="x4"/>
+          </input>
+        </object>
+      </objects>
+    </object>
+    <object class="relation" id="ba453efb-fddb-42e2-9b5c-190f3a80fbd8">
+      <type isNegated="false">Thme</type>
+      <output graphObjectId="807bf38c-0fd3-47b9-b877-0b89c400222e"/>
+      <input>
+        <arc coreferenceLink="x2"/>
+      </input>
+    </object>
+  </objects>
+</Context>
+
