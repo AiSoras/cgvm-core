@@ -18,8 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 public class TypeHierarchy {
 
-    public static final String DEF = Constant.DEF;
-
     public enum Order {
         EQ,
         GT,

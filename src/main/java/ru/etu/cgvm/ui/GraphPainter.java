@@ -9,6 +9,7 @@ import com.mxgraph.view.mxStylesheet;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import ru.etu.cgvm.objects.Arc;
+import ru.etu.cgvm.objects.Constant;
 import ru.etu.cgvm.objects.TypeHierarchy;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.graphs.Context;
@@ -178,7 +179,7 @@ public class GraphPainter {
 
             typeDefinitions.forEach(typeDefinition -> {
                 Object type = insertVertex(graphFrame, typeHierarchyContext, typeDefinition.getKey(), Style.CONCEPT.name());
-                Object def = insertVertex(graphFrame, typeHierarchyContext, TypeHierarchy.DEF, Style.RELATION.name());
+                Object def = insertVertex(graphFrame, typeHierarchyContext, Constant.DEF, Style.RELATION.name());
                 Object lambda = insertVertex(graphFrame, typeHierarchyContext, typeDefinition.getValue().getStringRepresentation(), Style.CONCEPT.name());
                 graphObjects.put(typeDefinition.getValue().getId(), lambda);
                 insertArrow(graphFrame, typeHierarchyContext, type, def);
