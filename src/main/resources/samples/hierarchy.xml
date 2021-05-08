@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Context class="context" id="80b532f7-6a10-468f-bbaf-d3f8fb62a96f" isSpecialContext="false" isNegated="false">
+  <typeHierarchy>
+    <typeOrders>
+      <order>
+        <left>GoingTo</left>
+        <middle>LT</middle>
+        <right>Dest</right>
+      </order>
+    </typeOrders>
+    <typeDefinitions>
+      <definition>
+        <GoingTo class="lambda" id="f7e9545c-b626-4a69-b7fd-19f983ebced5">
+          <typeHierarchy>
+            <typeOrders/>
+            <typeDefinitions/>
+          </typeHierarchy>
+          <objects>
+            <object class="concept" id="263bd086-139b-4f23-930d-036fe2357e9c">
+              <type isNegated="false">Go</type>
+              <referent/>
+              <coreferenceLinks>
+                <link>*z</link>
+              </coreferenceLinks>
+            </object>
+            <object class="relation" id="8db7003d-e9eb-41ac-ad8b-c4c11dccaf79">
+              <type isNegated="false">Agnt</type>
+              <output coreferenceLink="x"/>
+              <input>
+                <arc coreferenceLink="z"/>
+              </input>
+            </object>
+            <object class="relation" id="e87db87e-65f3-4c93-b9f8-191d73fb33d0">
+              <type isNegated="false">Dest</type>
+              <output coreferenceLink="y"/>
+              <input>
+                <arc coreferenceLink="z"/>
+              </input>
+            </object>
+          </objects>
+          <signature>
+            <parameter variable="x">
+              <type isNegated="false">Person</type>
+              <stringRepresentation>Person *x</stringRepresentation>
+            </parameter>
+            <parameter variable="y">
+              <type isNegated="false">City</type>
+              <stringRepresentation>City *y</stringRepresentation>
+            </parameter>
+          </signature>
+        </GoingTo>
+      </definition>
+    </typeDefinitions>
+  </typeHierarchy>
+  <objects/>
+</Context>
+

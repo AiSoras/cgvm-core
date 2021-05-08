@@ -1,5 +1,6 @@
 package ru.etu.cgvm.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class SignatureParameter {
         }
     }
 
+    @JsonIgnore
     public String getStringRepresentation() {
         return type.getName() + (variable == null ? "" : " *" + variable);
 
