@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Context class="context" id="3d554dc3-323a-475a-a2fe-5f1e33c99059" isSpecialContext="false" isNegated="false">
+  <typeHierarchy>
+    <typeOrders/>
+    <typeDefinitions/>
+  </typeHierarchy>
+  <objects>
+    <object class="context" id="c60e06cb-fbe3-429e-a775-9b75fb569a02" isSpecialContext="true" isNegated="false"
+            name="SELECT">
+      <typeHierarchy>
+        <typeOrders/>
+        <typeDefinitions/>
+      </typeHierarchy>
+      <objects>
+        <object class="context" id="01b79c78-8f7b-4bc5-aff4-18052f8615d4" isSpecialContext="false" isNegated="false"
+                name="Proposition">
+          <typeHierarchy>
+            <typeOrders/>
+            <typeDefinitions/>
+          </typeHierarchy>
+          <objects>
+            <object class="concept" id="5dabf52a-f163-4006-bfed-55507dd9d602">
+              <type isNegated="false">Want</type>
+              <coreferenceLinks/>
+            </object>
+            <object class="concept" id="a0c74803-837e-45b6-8961-4027079a4d09">
+              <type isNegated="false">Person</type>
+              <referent isNegated="false">
+                <descriptor structure="{*}"/>
+              </referent>
+              <coreferenceLinks/>
+            </object>
+            <object class="relation" id="1742f995-a060-497d-9e8b-59b3125c2cef">
+              <type isNegated="false">Agnt</type>
+              <output graphObjectId="a0c74803-837e-45b6-8961-4027079a4d09"/>
+              <input>
+                <arc graphObjectId="5dabf52a-f163-4006-bfed-55507dd9d602"/>
+              </input>
+            </object>
+          </objects>
+        </object>
+      </objects>
+    </object>
+  </objects>
+</Context>
+

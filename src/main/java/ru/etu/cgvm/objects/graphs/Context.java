@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.base.GraphObject;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -17,7 +16,6 @@ import static ru.etu.cgvm.objects.Constant.TILDA;
 
 @ToString
 @NoArgsConstructor
-@XmlRootElement(name = "graph")
 public class Context extends Graph {
 
     @JacksonXmlProperty(isAttribute = true)

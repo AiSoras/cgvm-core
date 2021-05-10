@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<Context class="context" id="80b532f7-6a10-468f-bbaf-d3f8fb62a96f" isSpecialContext="false" isNegated="false">
+<Context class="context" id="3585e96e-e69c-4cde-b23a-72bea3b0de76" isSpecialContext="false" isNegated="false">
   <typeHierarchy>
     <typeOrders>
       <order>
@@ -10,26 +10,26 @@
     </typeOrders>
     <typeDefinitions>
       <definition>
-        <GoingTo class="lambda" id="f7e9545c-b626-4a69-b7fd-19f983ebced5">
+        <GoingTo class="lambda" id="ea5d5e07-9faa-4005-99da-179a8a44808f">
           <typeHierarchy>
             <typeOrders/>
             <typeDefinitions/>
           </typeHierarchy>
           <objects>
-            <object class="concept" id="263bd086-139b-4f23-930d-036fe2357e9c">
+            <object class="concept" id="83d01328-d58d-4439-ad28-22108ff7c951">
               <type isNegated="false">Go</type>
               <coreferenceLinks>
                 <link>*z</link>
               </coreferenceLinks>
             </object>
-            <object class="relation" id="8db7003d-e9eb-41ac-ad8b-c4c11dccaf79">
+            <object class="relation" id="4913b209-df64-4c0b-9e4e-2a374888ffd4">
               <type isNegated="false">Agnt</type>
               <output coreferenceLink="x"/>
               <input>
                 <arc coreferenceLink="z"/>
               </input>
             </object>
-            <object class="relation" id="e87db87e-65f3-4c93-b9f8-191d73fb33d0">
+            <object class="relation" id="e08f0839-6490-484d-900a-b17d29f39d4a">
               <type isNegated="false">Dest</type>
               <output coreferenceLink="y"/>
               <input>
@@ -40,11 +40,9 @@
           <signature>
             <parameter variable="x">
               <type isNegated="false">Person</type>
-              <stringRepresentation>Person *x</stringRepresentation>
             </parameter>
             <parameter variable="y">
               <type isNegated="false">City</type>
-              <stringRepresentation>City *y</stringRepresentation>
             </parameter>
           </signature>
         </GoingTo>

@@ -76,7 +76,9 @@ public class CgifGenerator {
     private static String translateRelation(final Relation relation) {
         return LEFT_PARENTHESIS
                 + relation.getStringRepresentation()
-                + relation.getInputArcs().stream().map(CgifGenerator::translateArc).collect(Collectors.joining(SPACE, SPACE, SPACE))
+                + relation.getInputArcs().stream()
+                .map(CgifGenerator::translateArc)
+                .collect(Collectors.joining(SPACE, SPACE, SPACE))
                 + translateArc(relation.getOutput())
                 + RIGHT_PARENTHESIS;
     }
