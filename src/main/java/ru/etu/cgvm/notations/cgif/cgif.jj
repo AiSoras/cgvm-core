@@ -50,17 +50,17 @@ SKIP : {
 | "\r"
 }
 
-// when /* is seen in the DEFAULT state, skip it and switch to the IN_MULTI_LINE_COMMENT state
+// Если попадается /* в состоянии DEFAULT, пропускаем и переключаемся в состояние IN_MULTI_LINE_COMMENT
 MORE : {
   "/*" : IN_MULTI_LINE_COMMENT
 }
 
-// when any other character is seen in the IN_MULTI_LINE_COMMENT state, skip it.
+// В состоянии IN_MULTI_LINE_COMMENT пропускаем все символы
 <IN_MULTI_LINE_COMMENT> MORE : {
     < ~[] >
 }
 
-// when */ is seen in the IN_COMMENT state, skip it and switch back to the DEFAULT state
+// Если в состоянии IN_MULTI_LINE_COMMENT попадается */ пропускаем его и снова переключаемся в режим DEFAULT
 <IN_MULTI_LINE_COMMENT> SPECIAL_TOKEN : {
      "*/" : DEFAULT
 }
