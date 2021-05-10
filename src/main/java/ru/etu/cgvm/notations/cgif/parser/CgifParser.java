@@ -283,6 +283,9 @@ public class CgifParser implements CgifParserConstants {
                     {
                         if ("" != null) return referent;
                     }
+                    {
+                        if ("" != null) return null;
+                    }
                     break;
                 }
                 default:
@@ -978,6 +981,26 @@ public class CgifParser implements CgifParserConstants {
         }
     }
 
+    private boolean jj_3R_29() {
+        return jj_3R_33();
+    }
+
+    private boolean jj_3R_41() {
+        return jj_scan_token(LBRACKET);
+    }
+
+    private boolean jj_3_7() {
+        return jj_3R_13();
+    }
+
+    private boolean jj_3R_34() {
+        return jj_3R_38();
+    }
+
+    private boolean jj_3_9() {
+        return jj_3R_18();
+    }
+
     private boolean jj_3R_36() {
         return jj_3R_40();
     }
@@ -985,10 +1008,6 @@ public class CgifParser implements CgifParserConstants {
     private boolean jj_3R_17() {
         if (jj_scan_token(LPAREN)) return true;
         return jj_scan_token(DEF);
-    }
-
-    private boolean jj_3R_39() {
-        return jj_scan_token(LPAREN);
     }
 
     private boolean jj_3_2() {
@@ -1019,17 +1038,25 @@ public class CgifParser implements CgifParserConstants {
         return jj_3R_41();
     }
 
-    private boolean jj_3R_18() {
-        if (jj_scan_token(LPAREN)) return true;
-        return jj_scan_token(DEF);
+    private boolean jj_3R_39() {
+        return jj_scan_token(LPAREN);
     }
 
     private boolean jj_3R_32() {
         return jj_scan_token(TILDE);
     }
 
+    private boolean jj_3R_18() {
+        if (jj_scan_token(LPAREN)) return true;
+        return jj_scan_token(DEF);
+    }
+
     private boolean jj_3_4() {
         return jj_3R_15();
+    }
+
+    private boolean jj_3_1() {
+        return jj_3R_12();
     }
 
     private boolean jj_3R_16() {
@@ -1037,14 +1064,6 @@ public class CgifParser implements CgifParserConstants {
         xsp = jj_scanpos;
         if (jj_3R_24()) jj_scanpos = xsp;
         return jj_scan_token(IDENTIFIER);
-    }
-
-    private boolean jj_3R_24() {
-        return jj_scan_token(TILDE);
-    }
-
-    private boolean jj_3_1() {
-        return jj_3R_12();
     }
 
     private boolean jj_3R_33() {
@@ -1069,6 +1088,10 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
+    private boolean jj_3R_24() {
+        return jj_scan_token(TILDE);
+    }
+
     private boolean jj_3R_12() {
         if (jj_scan_token(LBRACKET)) return true;
         Token xsp;
@@ -1079,6 +1102,19 @@ public class CgifParser implements CgifParserConstants {
         xsp = jj_scanpos;
         if (jj_3R_20()) jj_scanpos = xsp;
         return jj_scan_token(RBRACKET);
+    }
+
+    private boolean jj_3R_38() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_3R_42()) {
+            jj_scanpos = xsp;
+            if (jj_3R_43()) {
+                jj_scanpos = xsp;
+                return jj_3R_44();
+            }
+        }
+        return false;
     }
 
     private boolean jj_3R_19() {
@@ -1108,23 +1144,6 @@ public class CgifParser implements CgifParserConstants {
         return jj_scan_token(LESSTHAN);
     }
 
-    private boolean jj_3R_30() {
-        return jj_scan_token(RELATED_MARK);
-    }
-
-    private boolean jj_3R_38() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_3R_42()) {
-            jj_scanpos = xsp;
-            if (jj_3R_43()) {
-                jj_scanpos = xsp;
-                return jj_3R_44();
-            }
-        }
-        return false;
-    }
-
     private boolean jj_3R_42() {
         Token xsp;
         xsp = jj_scanpos;
@@ -1140,12 +1159,20 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
+    private boolean jj_3R_30() {
+        return jj_scan_token(RELATED_MARK);
+    }
+
     private boolean jj_3R_45() {
         return jj_scan_token(ADDITIONAL_INFO);
     }
 
     private boolean jj_3R_46() {
         return jj_scan_token(POUNDSIGN);
+    }
+
+    private boolean jj_3_3() {
+        return jj_3R_14();
     }
 
     private boolean jj_3R_13() {
@@ -1156,10 +1183,6 @@ public class CgifParser implements CgifParserConstants {
             return jj_3R_22();
         }
         return false;
-    }
-
-    private boolean jj_3_3() {
-        return jj_3R_14();
     }
 
     private boolean jj_3R_21() {
@@ -1177,6 +1200,19 @@ public class CgifParser implements CgifParserConstants {
         return false;
     }
 
+    private boolean jj_3R_43() {
+        Token xsp;
+        xsp = jj_scanpos;
+        if (jj_scan_token(42)) {
+            jj_scanpos = xsp;
+            if (jj_scan_token(49)) {
+                jj_scanpos = xsp;
+                return jj_3R_46();
+            }
+        }
+        return false;
+    }
+
     private boolean jj_3R_20() {
         return jj_3R_27();
     }
@@ -1189,17 +1225,8 @@ public class CgifParser implements CgifParserConstants {
         return jj_3R_16();
     }
 
-    private boolean jj_3R_43() {
-        Token xsp;
-        xsp = jj_scanpos;
-        if (jj_scan_token(42)) {
-            jj_scanpos = xsp;
-            if (jj_scan_token(49)) {
-                jj_scanpos = xsp;
-                return jj_3R_46();
-            }
-        }
-        return false;
+    private boolean jj_3R_44() {
+        return jj_scan_token(QUANTIFIER);
     }
 
     private boolean jj_3R_22() {
@@ -1217,10 +1244,6 @@ public class CgifParser implements CgifParserConstants {
             }
         }
         return false;
-    }
-
-    private boolean jj_3R_44() {
-        return jj_scan_token(QUANTIFIER);
     }
 
     private boolean jj_3R_35() {
@@ -1252,28 +1275,8 @@ public class CgifParser implements CgifParserConstants {
         return jj_scan_token(STRUCTURE);
     }
 
-    private boolean jj_3R_29() {
-        return jj_3R_33();
-    }
-
-    private boolean jj_3R_41() {
-        return jj_scan_token(LBRACKET);
-    }
-
-    private boolean jj_3_7() {
-        return jj_3R_13();
-    }
-
     private boolean jj_3R_23() {
         return jj_scan_token(ADDITIONAL_INFO);
-    }
-
-    private boolean jj_3_9() {
-        return jj_3R_18();
-    }
-
-    private boolean jj_3R_34() {
-        return jj_3R_38();
     }
 
     /**

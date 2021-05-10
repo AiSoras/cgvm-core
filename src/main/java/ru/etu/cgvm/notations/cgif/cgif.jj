@@ -197,16 +197,19 @@ Referent referent(): {
     Referent.Descriptor descriptor = null;
     Referent.Designation designation = null;
 } {
-     <COLON> [LOOKAHEAD(2) descriptor = descriptor()] [designation = designation()]
+     <COLON> ([LOOKAHEAD(2) descriptor = descriptor()] [designation = designation()]
     {
         referent.setDescriptor(descriptor);
         referent.setDesignation(designation);
         return referent;
-    }
-  | <TILDE>
+    })
+  | (<TILDE>
     {
         referent.setNegated(true);
         return referent;
+    })
+    {
+        return null;
     }
 }
 

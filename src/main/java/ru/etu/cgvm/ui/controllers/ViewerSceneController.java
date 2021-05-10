@@ -203,6 +203,5 @@ public class ViewerSceneController {
         );
         fileChooser.getExtensionFilters().add(Notation.CGIF.getFileFilter());
         fileChooser.getExtensionFilters().add(Notation.XML.getFileFilter());
-        // fileChooser.getExtensionFilters().add(Notation.RDF.getFileFilter());
     }
 }
