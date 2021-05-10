@@ -1,42 +1,77 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<Context class="context" id="baac0593-42e1-4af1-8c5a-b372919bf470" isSpecialContext="false" isNegated="false">
+<Context class="context" id="4bfe029f-7c5e-490d-8bef-2ad907367b9a" isSpecialContext="false" isNegated="false">
   <typeHierarchy>
     <typeOrders/>
     <typeDefinitions/>
   </typeHierarchy>
   <objects>
-    <object class="concept" id="83418ae9-1244-423e-a939-3c6224952bb2">
-      <type isNegated="false">Person</type>
-      <referent isNegated="false">
-        <descriptor/>
-        <designation locator="Veronika"/>
-      </referent>
-      <coreferenceLinks>
-        <link>*x1</link>
-      </coreferenceLinks>
-    </object>
-    <object class="concept" id="b0f65f10-c306-4ab8-8635-6ffaf6311557">
-      <type isNegated="false">Think</type>
-      <referent/>
-      <coreferenceLinks>
-        <link>*x2</link>
-      </coreferenceLinks>
-    </object>
-    <object class="relation" id="2d3257f6-56f4-4ad5-998a-66f646585f2e">
+    <object class="relation" id="75ff139e-6468-49c8-ad65-4a2765218660">
       <type isNegated="false">Agnt</type>
       <output coreferenceLink="x1"/>
       <input>
         <arc coreferenceLink="x2"/>
       </input>
     </object>
-    <object class="context" id="3327235f-6125-4c5f-b7ea-c06bf913350f" isSpecialContext="false" isNegated="false"
+    <object class="context" id="983f183d-ceab-44f7-a4ec-d2347bfdb919" isSpecialContext="false" isNegated="false"
             name="Proposition">
       <typeHierarchy>
         <typeOrders/>
         <typeDefinitions/>
       </typeHierarchy>
       <objects>
-        <object class="concept" id="4e4a44c0-f178-4e2f-85b3-e57b2590b66f">
+        <object class="relation" id="1a4d1ad4-ce07-4d6f-ba15-bf6e70315181">
+          <type isNegated="false">Agnt</type>
+          <output coreferenceLink="x3"/>
+          <input>
+            <arc coreferenceLink="x4"/>
+          </input>
+        </object>
+        <object class="context" id="a8156b62-1d4d-4ebe-b925-64feb7219fb7" isSpecialContext="false" isNegated="false"
+                name="Situation">
+          <typeHierarchy>
+            <typeOrders/>
+            <typeDefinitions/>
+          </typeHierarchy>
+          <objects>
+            <object class="concept" id="2b4061a4-2c49-40da-9f11-dfb208028357">
+              <type isNegated="false">Go</type>
+              <referent/>
+              <coreferenceLinks>
+                <link>*x5</link>
+              </coreferenceLinks>
+            </object>
+            <object class="relation" id="83b5d69d-7bb9-4d6d-acb4-66df24a52ff9">
+              <type isNegated="false">Agnt</type>
+              <output coreferenceLink="x3"/>
+              <input>
+                <arc graphObjectId="2b4061a4-2c49-40da-9f11-dfb208028357"/>
+              </input>
+            </object>
+            <object class="concept" id="9959b427-f7c9-4948-9e62-c4f19c0f7936">
+              <type isNegated="false">Lesson</type>
+              <referent isNegated="false">
+                <descriptor/>
+                <designation locator="Art"/>
+              </referent>
+              <coreferenceLinks/>
+            </object>
+            <object class="relation" id="5aa99ffd-3f9f-42c1-bebf-2ab3ff234d5f">
+              <type isNegated="false">Object</type>
+              <output graphObjectId="9959b427-f7c9-4948-9e62-c4f19c0f7936"/>
+              <input>
+                <arc coreferenceLink="x5"/>
+              </input>
+            </object>
+          </objects>
+        </object>
+        <object class="relation" id="0b7219ff-ff98-4e26-bd92-1419fa1dc66e">
+          <type isNegated="false">Thme</type>
+          <output graphObjectId="a8156b62-1d4d-4ebe-b925-64feb7219fb7"/>
+          <input>
+            <arc coreferenceLink="x4"/>
+          </input>
+        </object>
+        <object class="concept" id="8f43910f-c14a-4458-b644-f5e10c86280f">
           <type isNegated="false">Person</type>
           <referent isNegated="false">
             <descriptor/>
@@ -46,73 +81,38 @@
             <link>*x3</link>
           </coreferenceLinks>
         </object>
-        <object class="concept" id="3c7f51b9-4ed1-400a-a507-e9d8085846c6">
+        <object class="concept" id="ca2a3fcf-4835-4f34-bcb8-11bc50003308">
           <type isNegated="false">Want</type>
           <referent/>
           <coreferenceLinks>
             <link>*x4</link>
           </coreferenceLinks>
         </object>
-        <object class="relation" id="99e53b18-79a9-47e6-b19e-06bf0f66b243">
-          <type isNegated="false">Agnt</type>
-          <output coreferenceLink="x3"/>
-          <input>
-            <arc coreferenceLink="x4"/>
-          </input>
-        </object>
-        <object class="context" id="113032e9-8fbf-4b3d-b479-5e2da123308c" isSpecialContext="false" isNegated="false"
-                name="Situation">
-          <typeHierarchy>
-            <typeOrders/>
-            <typeDefinitions/>
-          </typeHierarchy>
-          <objects>
-            <object class="concept" id="3bcf26e9-99f3-4edf-9f31-0c0a8c039029">
-              <type isNegated="false">Go</type>
-              <referent/>
-              <coreferenceLinks>
-                <link>*x5</link>
-              </coreferenceLinks>
-            </object>
-            <object class="relation" id="67eecfff-9a46-448f-b459-d70e371069f3">
-              <type isNegated="false">Agnt</type>
-              <output coreferenceLink="x3"/>
-              <input>
-                <arc graphObjectId="3bcf26e9-99f3-4edf-9f31-0c0a8c039029"/>
-              </input>
-            </object>
-            <object class="concept" id="c5e3ed61-d56f-43a0-8cf3-87e45df132b4">
-              <type isNegated="false">Lesson</type>
-              <referent isNegated="false">
-                <descriptor/>
-                <designation locator="Art"/>
-              </referent>
-              <coreferenceLinks/>
-            </object>
-            <object class="relation" id="5dff2f66-467c-4f1e-b236-9d434a6e6a2f">
-              <type isNegated="false">Object</type>
-              <output graphObjectId="c5e3ed61-d56f-43a0-8cf3-87e45df132b4"/>
-              <input>
-                <arc coreferenceLink="x5"/>
-              </input>
-            </object>
-          </objects>
-        </object>
-        <object class="relation" id="6c96f5ec-6ac5-4fe9-bfbc-eeb567489fce">
-          <type isNegated="false">Thme</type>
-          <output graphObjectId="113032e9-8fbf-4b3d-b479-5e2da123308c"/>
-          <input>
-            <arc coreferenceLink="x4"/>
-          </input>
-        </object>
       </objects>
     </object>
-    <object class="relation" id="a3897c7d-8f73-4bba-8576-29b0051dc317">
+    <object class="relation" id="cefd2382-f326-40dd-b06c-e46afdc8fe17">
       <type isNegated="false">Thme</type>
-      <output graphObjectId="3327235f-6125-4c5f-b7ea-c06bf913350f"/>
+      <output graphObjectId="983f183d-ceab-44f7-a4ec-d2347bfdb919"/>
       <input>
         <arc coreferenceLink="x2"/>
       </input>
+    </object>
+    <object class="concept" id="a026f759-f562-4612-856d-9026bfb25562">
+      <type isNegated="false">Person</type>
+      <referent isNegated="false">
+        <descriptor/>
+        <designation locator="Veronika"/>
+      </referent>
+      <coreferenceLinks>
+        <link>*x1</link>
+      </coreferenceLinks>
+    </object>
+    <object class="concept" id="8e76ba2c-a65b-49ed-b56f-c3e693918522">
+      <type isNegated="false">Think</type>
+      <referent/>
+      <coreferenceLinks>
+        <link>*x2</link>
+      </coreferenceLinks>
     </object>
   </objects>
 </Context>

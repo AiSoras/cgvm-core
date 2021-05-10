@@ -3,7 +3,6 @@ package ru.etu.cgvm.objects;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import ru.etu.cgvm.objects.base.Graph;
 import ru.etu.cgvm.objects.graphs.Context;
@@ -16,12 +15,10 @@ import java.util.Optional;
 public class Arc {
 
     // Взаимоисключающие поля
-    @Setter
     @JsonIgnore
     private Concept concept;
     @JacksonXmlProperty(isAttribute = true)
     private String coreferenceLink;
-    @Setter
     @JsonIgnore
     private Context context; // В отношениях. В акторах используются только концепты
     private String graphObjectId;
@@ -33,6 +30,16 @@ public class Arc {
             Optional.ofNullable(context).ifPresent(object -> graphObjectId = object.getId());
         }
         return graphObjectId;
+    }
+
+    public void setConcept(Concept concept) {
+        this.concept = concept;
+        this.graphObjectId = concept.getId();
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+        this.graphObjectId = context.getId();
     }
 
     @JsonIgnore

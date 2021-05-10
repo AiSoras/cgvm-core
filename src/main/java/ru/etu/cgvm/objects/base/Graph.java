@@ -1,7 +1,6 @@
 package ru.etu.cgvm.objects.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AccessLevel;
@@ -30,7 +29,6 @@ public abstract class Graph extends GraphObject {
     @JacksonXmlProperty(localName = "object")
     private final Collection<GraphObject> objectStore = new LinkedList<>();
     @Getter
-    @JsonInclude
     private final TypeHierarchy typeHierarchy = new TypeHierarchy();
 
     protected Graph(Graph graph) {

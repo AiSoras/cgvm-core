@@ -1,7 +1,6 @@
 package ru.etu.cgvm.objects.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +15,6 @@ public abstract class Node extends GraphObject {
 
     @Getter
     @Setter
-    @JsonInclude
     protected Type type;
 
     protected Node(Node node) {

@@ -1,7 +1,6 @@
 package ru.etu.cgvm.objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,9 +21,7 @@ import static ru.etu.cgvm.objects.Constant.*;
 public class Referent {
 
     // Взаимоисключающие поля
-    @JsonInclude
     private Descriptor descriptor;
-    @JsonInclude
     private Designation designation;
     @JacksonXmlProperty(isAttribute = true, localName = "isNegated")
     private boolean isNegated;

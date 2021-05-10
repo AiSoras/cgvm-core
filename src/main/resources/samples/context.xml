@@ -69,7 +69,6 @@
           <objects>
             <object class="concept" id="afef4e11-3f05-4d04-a7d8-0a29f0791682">
               <type isNegated="false">Learn</type>
-              <referent/>
               <coreferenceLinks>
                 <link>*x5</link>
               </coreferenceLinks>
@@ -83,7 +82,6 @@
             </object>
             <object class="concept" id="bb641cf1-5cfc-42dd-beba-c89a5566f9d4">
               <type isNegated="false">University</type>
-              <referent/>
               <coreferenceLinks/>
             </object>
             <object class="relation" id="da972f38-cd4d-4c5c-b7b5-4c85de7e8334">

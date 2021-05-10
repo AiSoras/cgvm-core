@@ -1,0 +1,2 @@
+(Agnt ?x2 ?x1)(Thme ?x2 [Proposition(Agnt ?x4 ?x3)(Thme ?x4 [Situation(Agnt [Go *x5] ?x3)(Object ?x5 [Lesson:  Art])])
+[Person *x3:  Ivan][Want *x4]])[Person *x1:  Veronika][Think *x2]

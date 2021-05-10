@@ -18,7 +18,6 @@
           <objects>
             <object class="concept" id="263bd086-139b-4f23-930d-036fe2357e9c">
               <type isNegated="false">Go</type>
-              <referent/>
               <coreferenceLinks>
                 <link>*z</link>
               </coreferenceLinks>

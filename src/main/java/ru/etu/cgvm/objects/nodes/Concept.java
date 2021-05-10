@@ -1,7 +1,6 @@
 package ru.etu.cgvm.objects.nodes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Getter;
@@ -25,7 +24,6 @@ public class Concept extends Node {
 
     @Setter
     @Getter
-    @JsonInclude
     private Referent referent;
     @JacksonXmlElementWrapper(localName = "coreferenceLinks")
     @JacksonXmlProperty(localName = "link")
