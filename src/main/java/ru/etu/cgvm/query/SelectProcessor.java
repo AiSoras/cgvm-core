@@ -37,14 +37,18 @@ public class SelectProcessor {
         });
     }
 
-    public static Collection<Context> select(final Context originalGraph, final Context query) {
+    public static Collection<Context> select(final Context originalGraph,
+                                             Context query) {
         Collection<Context> result = new LinkedList<>();
-        Map<Context, Map<GraphObject, Collection<GraphObject>>> overlaps = getContextsWithFullProjection(originalGraph, query);
-        overlaps.forEach((originalContext, overlap) -> result.addAll(getObjectsContexts(originalContext, overlap)));
+        Map<Context, Map<GraphObject, Collection<GraphObject>>> overlaps =
+                getContextsWithFullProjection(originalGraph, query);
+        overlaps.forEach((originalContext, overlap) ->
+                result.addAll(getObjectsContexts(originalContext, overlap)));
         return getValidContexts(result);
     }
 
-    private static Collection<Context> getObjectsContexts(final Context context, final Map<GraphObject, Collection<GraphObject>> overlap) {
+    private static Collection<Context> getObjectsContexts(final Context context, final Map<GraphObject,
+            Collection<GraphObject>> overlap) {
         overlap.entrySet().forEach(entry -> {
             if (entry.getKey() instanceof Context) {
                 entry.setValue(entry.getValue().stream()
@@ -90,7 +94,7 @@ public class SelectProcessor {
     //     ^ контекст исходного графа (может несколько подходить)
     //                 ^ объект контекста из запроса и соотвествующие ему элементы контекста исходного графа
     // Получаем, что количество подходящих результатов равно: сумме П(Collection<GraphObject> sizes) по каждому контексту-ключу в словаре
-    // Общее число = умножению сумм П(Collection<GraphObject> sizes)
+    // При этом при подсчете П(Collection<GraphObject> sizes) стоит учитывать вложенные контексты
     private static Map<Context, Map<GraphObject, Collection<GraphObject>>> getContextsWithFullProjection(final Context originalGraph, final Context targetContext) {
         Map<Context, Map<GraphObject, Collection<GraphObject>>> result = new HashMap<>();
         Collection<Context> contexts = new LinkedList<>(GraphObjectUtils.getAllObjects(originalGraph, Context.class));

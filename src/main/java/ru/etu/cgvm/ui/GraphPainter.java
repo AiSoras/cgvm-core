@@ -40,8 +40,6 @@ public class GraphPainter {
             mxConstants.STYLE_FILLCOLOR, mxUtils.getHexColorString(Color.WHITE),
             mxConstants.STYLE_STROKECOLOR, mxUtils.getHexColorString(Color.BLACK),
             mxConstants.STYLE_STROKEWIDTH, 1.5,
-            //mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_LEFT,
-            //mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_TOP,
             mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE,
             mxConstants.STYLE_PERIMETER, mxConstants.PERIMETER_RECTANGLE);
 
