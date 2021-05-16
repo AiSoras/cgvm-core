@@ -1,2 +1,10 @@
-# cgvm-core
-Conceptual graph model processing virtual machine
+# Conceptual graph model processing virtual machine
+
+Реализация компонентов виртуальной машины обработки моделей концептуальных графов.
+
+# Запуск приложения
+1. Необходим установленный заранее Apache Maven.
+2. В корне проекта в командной строке выполнить команду:
+````
+mvn javafx:run
+````
