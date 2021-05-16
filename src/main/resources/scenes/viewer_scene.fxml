@@ -25,7 +25,6 @@
                                    AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
                     <ToggleButton selected="true" text="CGIF" textAlignment="CENTER"/>
                     <ToggleButton text="XML" textAlignment="CENTER"/>
-                    <!-- <ToggleButton text="RDF" textAlignment="CENTER"/> -->
                 </ToggleButtonGroup>
                 <Label layoutX="29.0" layoutY="33.0" text="Входной формат" AnchorPane.leftAnchor="30.0"
                        AnchorPane.topAnchor="33.0">
