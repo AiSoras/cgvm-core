@@ -27,7 +27,8 @@ public class XmlObjectMapper {
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
-        mapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true); // for header <?xml version="1.0" encoding="UTF-8"?>
+        // for header <?xml version="1.0" encoding="UTF-8"?>
+        mapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
     }
 
     public static <T> String convertObjectToXmlString(T object) {

@@ -3,9 +3,11 @@ package ru.etu.cgvm.ui.controllers;
 import com.gluonhq.charm.glisten.control.ToggleButtonGroup;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +53,7 @@ public class ViewerSceneController {
     private TextArea queryInput;
 
     @FXML
-    private TextArea queryOutput;
+    private VBox queryResults;
 
     @FXML
     private Tab resultTab;
@@ -108,9 +110,18 @@ public class ViewerSceneController {
                 showInfoAlert("Выражение не является запросом!");
             }
             Collection<Context> results = SelectProcessor.select(originalGraph, queryContext);
-            queryOutput.setText(results.stream()
-                    .map(CgifGenerator::convert)
-                    .collect(Collectors.joining("\n***\n")));
+            ListView<String> listView;
+            if (results.isEmpty()) {
+                listView = new ListView<>(FXCollections.observableArrayList("Не найдены элементы, удовлетворяющие запросу"));
+            } else {
+                listView = new ListView<>(
+                        FXCollections.observableList(results.stream()
+                                .map(CgifGenerator::convert)
+                                .collect(Collectors.toList()))
+                );
+            }
+            queryResults.getChildren().clear();
+            queryResults.getChildren().addAll(listView);
             queryTabs.getSelectionModel().select(resultTab);
         } catch (ParseException e) {
             showErrorAlert(e);

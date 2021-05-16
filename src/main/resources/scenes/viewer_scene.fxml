@@ -4,7 +4,7 @@
 <?import javafx.embed.swing.SwingNode?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
 <VBox maxHeight="670.0" prefHeight="670.0" prefWidth="1178.0" xmlns="http://javafx.com/javafx/16"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.etu.cgvm.ui.controllers.ViewerSceneController">
     <MenuBar VBox.vgrow="NEVER">
@@ -42,9 +42,8 @@
                 <TextArea fx:id="input" layoutX="30.0" layoutY="55.0" prefHeight="150.0" prefWidth="200.0"
                           AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="85.0"/>
                 <TabPane fx:id="queryTabs" layoutY="328.0" prefHeight="294.0" prefWidth="324.0"
-                         tabClosingPolicy="UNAVAILABLE"
-                         AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                         AnchorPane.topAnchor="325.0">
+                         tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                         AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="325.0">
                     <Tab text="Запрос">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                             <Button mnemonicParsing="false" onAction="#executeQuery" text="Выполнить"
@@ -63,16 +62,11 @@
                             </TextArea>
                         </AnchorPane>
                     </Tab>
-                    <Tab text="Результат выполнения" fx:id="resultTab">
+                    <Tab fx:id="resultTab" text="Результат выполнения">
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <TextArea fx:id="queryOutput" editable="false" layoutX="14.0" layoutY="14.0"
-                                      prefHeight="200.0"
-                                      prefWidth="200.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0"
-                                      AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
-                                <font>
-                                    <Font size="14.0"/>
-                                </font>
-                            </TextArea>
+                            <VBox fx:id="queryResults" prefHeight="263.0" prefWidth="333.0"
+                                  AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                  AnchorPane.topAnchor="0.0"/>
                         </AnchorPane>
                     </Tab>
                 </TabPane>
