@@ -161,8 +161,8 @@ public class GraphPainter {
     }
 
     private void addTypeHierarchy(mxGraph graphFrame, Object parent, Graph context) {
-        List<Triple<String, TypeHierarchy.Order, String>> typeOrders = context.getTypeHierarchy().getTypeOrders();
-        List<Pair<String, Lambda>> typeDefinitions = context.getTypeHierarchy().getTypeDefinitions();
+        Collection<Triple<String, TypeHierarchy.Order, String>> typeOrders = context.getTypeHierarchy().getTypeOrders();
+        Collection<Pair<String, Lambda>> typeDefinitions = context.getTypeHierarchy().getTypeDefinitions();
 
         if (!typeDefinitions.isEmpty() || !typeOrders.isEmpty()) {
             Object typeHierarchyContext = insertVertex(graphFrame, parent, "TypeHierarchy", Style.CONTEXT.name());
